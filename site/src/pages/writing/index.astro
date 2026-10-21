@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import Icon from '../../components/Icon.astro';
+import { page, articles, settings } from '../../lib/data';
+// texts: src/content/pages/writing.json (CMS: עמודי האתר → מאמרים ומחשבות); the articles: src/content/articles (CMS: מאמרים)
+const p = await page('writing');
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription}>
+  <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/art/book.png" />
+  <section class="section section-tight">
+    <div class="shell">
+      <div class="grid grid-3">
+        {articles.map((a, i) => <div data-reveal style={`--d:${(i % 3) * 0.08}s`}><ArticleCard article={a} /></div>)}
+      </div>
+      {settings.facebook && (p.facebookNote || p.facebookButton) && (
+        <div class="note-box" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between">
+          {p.facebookNote && <p>{p.facebookNote}</p>}
+          {p.facebookButton && <a class="btn btn-ghost" href={settings.facebook} target="_blank" rel="noopener"><Icon name="fb" />{p.facebookButton}</a>}
+        </div>
+      )}
+    </div>
+  </section>
+</Base>

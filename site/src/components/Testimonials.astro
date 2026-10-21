@@ -1,0 +1,47 @@
+---
+// "מה אומרים על עפר": the testimonials collection (CMS: המלצות). Quotes as cards, then (optionally) the first few
+// videos, then links to all the videos and to the "write a recommendation" page. Renders nothing when there is nothing
+// to show. Used on the home page and on the lectures page.
+import Icon from './Icon.astro';
+import YouTube from './YouTube.astro';
+import { testimonials, testimonialVideo, bareQuote, withBase } from '../lib/data';
+interface Props { kicker?: string; title?: string; lead?: string; videos?: number; videosLink?: string; writeLink?: string; tone?: 'paper' | 'paper2' }
+const { kicker, title, lead, videos = 0, videosLink, writeLink, tone = 'paper' } = Astro.props;
+const quotes = testimonials.filter((t) => t.quote);
+const clips = testimonials.filter((t) => t.youtube && !t.quote).slice(0, videos);
+---
+{(quotes.length > 0 || clips.length > 0) && (
+  <section class:list={['section', 'testimonials', tone === 'paper2' && 'section-paper2']} id="testimonials">
+    <div class="shell">
+      {(kicker || title || lead) && (
+        <div class="section-head" data-reveal>
+          {kicker && <p class="kicker">{kicker}</p>}
+          {title && <h2 class="h2">{title}</h2>}
+          {lead && <p class="lead">{lead}</p>}
+        </div>
+      )}
+      {quotes.length > 0 && (
+        <div class="testimonial-grid">
+          {quotes.map((t, i) => (
+            <figure class="card testimonial" data-reveal style={`--d:${(i % 3) * 0.08}s`}>
+              <blockquote class="pull">״{bareQuote(t.quote)}״</blockquote>
+              <figcaption class="pull-src"><strong>{t.name}</strong>{t.role && <span>{t.role}</span>}</figcaption>
+              {t.youtube && <div class="testimonial-video"><YouTube video={testimonialVideo(t)} meta={false} sizes="(max-width: 760px) 100vw, 380px" /></div>}
+            </figure>
+          ))}
+        </div>
+      )}
+      {clips.length > 0 && (
+        <div class="voices testimonial-clips">
+          {clips.map((t, i) => <div data-reveal style={`--d:${(i % 3) * 0.06}s`}><YouTube video={testimonialVideo(t)} sizes="(max-width: 760px) 100vw, 380px" /></div>)}
+        </div>
+      )}
+      {(videosLink || writeLink) && (
+        <p class="testimonial-links">
+          {videosLink && clips.length > 0 && <a class="link-arrow" href={withBase('/video/#voices')}>{videosLink}<Icon name="arrow" /></a>}
+          {writeLink && <a class="btn btn-ghost" href={withBase('/recommend/')}>{writeLink}</a>}
+        </p>
+      )}
+    </div>
+  </section>
+)}

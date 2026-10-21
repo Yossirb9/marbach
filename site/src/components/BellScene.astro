@@ -1,0 +1,123 @@
+---
+// "קולות פעמונים" — the pinned, scroll-scrubbed signature scene of the home page (scripts/bell.ts drives it).
+// The volume of the bell's sound is the volume of the child's difficulty (Dr. Marbach's TEDx talk): the scroll rings the
+// bell three times, softly, louder, very loud. Each ring sends out its own wave and writes one line, in a size that
+// matches its volume. Then the waves settle into calm, even circles and the scattered letters gather into the title.
+// CSS below is the FINAL state (what no-JS and reduced-motion visitors see). The starting state lives under html.js,
+// set inline in <head> before first paint, so the finished scene never flashes before the script runs (lesson from
+// the Shahar Mor site). Only transform and opacity are animated.
+// Texts: home.json → bell (CMS: דף הבית → סצנת הפעמון). Exactly three lines, one per strike.
+import { img, withBase, page } from '../lib/data';
+const t = (await page('home')).bell;
+const bell = img('/media/art/bell_only.png', '(max-width: 760px) 40vw, 300px');
+const ripples = img('/media/art/ripples.png', '100vw');
+const title = t.title;
+// deterministic scatter for each letter (same numbers in CSS and in the script, read from data-*)
+let k = 0;
+const words = title.split(' ').map((w) => [...w].map((ch) => {
+  const i = k++;
+  return { ch, x: (((i * 37) % 11) - 5) * 6.5, y: (((i * 53) % 9) - 4) * 7, r: (((i * 29) % 13) - 6) * 7 };
+}));
+const lines = t.lines.slice(0, 3).map((line, i) => ({ t: line, cls: `v${i + 1}` }));
+const groups = [[70, 105, 140], [190, 245, 300], [360, 425, 490]];
+---
+<section class="bs" data-bell-scene aria-labelledby="bs-title">
+  <div class="bs-paper" aria-hidden="true">
+    <img class="bs-ripples" src={ripples.src} srcset={ripples.srcset} sizes="100vw" alt="" loading="lazy" decoding="async" data-bs-ripples />
+  </div>
+  <div class="bs-stage" aria-hidden="true"><div class="bs-anchor">
+    <div class="bs-rings-wrap">
+      {groups.map((g, gi) => (
+        <svg class={`bs-ring bs-ring-${gi + 1}`} data-bs-ring viewBox="0 0 1000 1000" focusable="false">
+          {g.map((r, ri) => <circle cx="500" cy="500" r={r} style={`opacity:${(1 - ri * 0.28).toFixed(2)}`} />)}
+        </svg>
+      ))}
+    </div>
+    <div class="bs-bell" data-bs-bell>
+      <img src={bell.src} srcset={bell.srcset} sizes={bell.sizes} width={bell.width} height={bell.height} alt="" decoding="async" />
+    </div>
+  </div></div>
+  <div class="bs-copy shell">
+    {t.kicker && <p class="kicker">{t.kicker}</p>}
+    <p class="bs-intro" data-bs-intro>{t.intro}</p>
+    <ul class="bs-lines">
+      {lines.map((l) => <li class={`bs-line ${l.cls}`} data-bs-line>{l.t}</li>)}
+    </ul>
+    <h2 class="bs-title" id="bs-title" aria-label={title}>
+      {words.map((w) => (
+        <span class="bs-word" aria-hidden="true">{w.map((c) => <span class="bs-ch" data-bs-ch data-x={c.x} data-y={c.y} data-r={c.r} style={`--x:${c.x}vw;--y:${c.y}vh;--r:${c.r}deg`}>{c.ch}</span>)}</span>
+      ))}
+    </h2>
+    <p class="bs-sub" data-bs-sub>{t.sub}</p>
+    <div class="bs-cta btn-row" data-bs-cta>
+      <a class="btn" href={withBase('/video/')}>{t.button}</a>
+      <a class="link-arrow" href="#signals">{t.link}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m6 6-6-6 6-6"/></svg></a>
+    </div>
+  </div>
+  <div class="bs-hint" data-bs-hint aria-hidden="true">{t.hint}<span>↓</span></div>
+</section>
+
+<style is:global>
+  .bs { position: relative; height: 100vh; height: 100svh; min-height: 600px; overflow: hidden; isolation: isolate; background:
+    radial-gradient(70% 60% at 22% 30%, rgba(164, 117, 52, 0.10), transparent 70%), var(--paper); }
+  .bs-paper { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+  .bs-ripples { position: absolute; left: -10%; top: 30%; width: 70%; max-width: none; opacity: 0.32; }
+  .bs-stage { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  /* the bell hangs on the "end" side (left in RTL); the rings are centred on its mouth */
+  .bs-anchor { position: absolute; left: 15vw; top: calc(var(--header-h) - 10px); width: clamp(180px, 19vw, 300px); aspect-ratio: 366 / 562; }
+  .bs-bell { position: absolute; left: 0; top: 0; width: 100%; transform-origin: 50% 0; }
+  .bs-bell img { width: 100%; height: auto; filter: drop-shadow(0 30px 30px rgba(27, 42, 44, 0.18)); }
+  .bs-rings-wrap { position: absolute; width: 170vmax; aspect-ratio: 1; left: 50%; top: 88%; translate: -50% -50%; }
+  .bs-ring { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; overflow: visible; color: var(--brass); }
+  .bs-ring circle { fill: none; stroke: currentColor; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+  .bs-ring { transform-origin: 50% 50%; opacity: 0.4; }
+  .bs-ring-3 { color: var(--sage-d); }
+
+  .bs-copy { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding-top: var(--header-h); padding-inline-end: min(44vw, 620px); }
+  .bs-intro { font-size: clamp(1.1rem, 0.95rem + 0.6vw, 1.5rem); color: var(--ink-soft); margin: 0 0 1.2rem; max-width: 34ch; }
+  .bs-lines { list-style: none; margin: 0 0 1.4rem; padding: 0; display: grid; gap: 0.15em; font-family: var(--serif); line-height: 1.15; }
+  .bs-line.v1 { font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.35rem); font-weight: 300; color: var(--muted); letter-spacing: 0.02em; }
+  .bs-line.v2 { font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2.2rem); font-weight: 500; color: var(--ink-soft); }
+  .bs-line.v3 { font-size: clamp(1.8rem, 1.2rem + 2.4vw, 3.4rem); font-weight: 700; color: var(--brass-text); letter-spacing: -0.015em; }
+  .bs-title { font-size: clamp(3rem, 1.6rem + 6vw, 7.2rem); font-weight: 500; line-height: 1; margin: 0 0 1.1rem; letter-spacing: -0.01em; white-space: nowrap; }
+  .bs-word { display: inline-block; white-space: nowrap; }
+  .bs-word + .bs-word { margin-inline-start: 0.24em; }
+  .bs-ch { display: inline-block; }
+  .bs-sub { font-size: clamp(1.08rem, 0.98rem + 0.45vw, 1.35rem); color: var(--ink-soft); max-width: 40ch; margin-bottom: 1.6rem; }
+  .bs-hint { position: absolute; z-index: 3; bottom: 3.5vh; left: 50%; translate: -50% 0; font-weight: 700; font-size: 0.92rem; color: var(--ink-soft);
+    background: rgba(245, 239, 228, 0.9); border: 1px solid var(--line); padding: 0.4em 1.1em; border-radius: 999px; opacity: 0; display: flex; gap: 0.5em; }
+  .bs-hint span { display: inline-block; animation: bs-hint 1.6s ease-in-out infinite; }
+  @keyframes bs-hint { 50% { transform: translateY(4px); } }
+
+  /* ---- starting state, only when the scene will be animated ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .bs-ring { opacity: 0; transform: scale(0.2); }
+    html.js .bs-intro, html.js .bs-line, html.js .bs-sub, html.js .bs-cta { opacity: 0; transform: translateY(22px); }
+    html.js .bs-ch { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); }
+    html.js .bs-hint { opacity: 1; }
+    html.js .bs-ripples { opacity: 0.12; transform: scale(0.92); }
+  }
+
+  @media (max-width: 860px) {
+    .bs-copy { padding-inline-end: 0; justify-content: flex-end; padding-bottom: 9vh; }
+    .bs-anchor { left: 6vw; top: calc(var(--header-h) + 8px); width: clamp(110px, 30vw, 170px); }
+    .bs-rings-wrap { width: 220vmax; }
+    .bs-ripples { left: -40%; top: 18%; width: 160%; }
+    .bs-title { font-size: clamp(2.6rem, 11.5vw, 4.4rem); }
+    .bs-intro { max-width: 26ch; }
+    .bs::after { content: ''; position: absolute; z-index: 1; inset: 45% 0 0; background: linear-gradient(rgba(245, 239, 228, 0), rgba(245, 239, 228, 0.85) 30%); pointer-events: none; }
+  }
+  @media (max-height: 700px) {
+    .bs-intro { margin-bottom: 0.6rem; }
+    .bs-lines { margin-bottom: 0.8rem; }
+    .bs-title { margin-bottom: 0.6rem; }
+    .bs-sub { margin-bottom: 1rem; font-size: 1rem; }
+    .bs-line.v3 { font-size: clamp(1.5rem, 1.1rem + 2vw, 2.6rem); }
+  }
+  @media (max-height: 700px) and (max-width: 860px) {
+    .bs-anchor { width: 104px; }
+    .bs-copy { padding-bottom: 6vh; }
+    .bs-title { font-size: clamp(2.3rem, 10.5vw, 3.6rem); }
+  }
+</style>

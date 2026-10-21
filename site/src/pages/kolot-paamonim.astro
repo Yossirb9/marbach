@@ -1,0 +1,112 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Img from '../components/Img.astro';
+import Icon from '../components/Icon.astro';
+import Rings from '../components/Rings.astro';
+import ContactBand from '../components/ContactBand.astro';
+import { page, settings, testimonials, bareQuote, img, withBase } from '../lib/data';
+// every text on this page: src/content/pages/book.json (CMS: עמודי האתר → קולות פעמונים)
+const p = await page('book');
+const { book, sentences, course, club } = p;
+// testimonials with a quote (CMS: המלצות); the link to the participants' videos goes on the last one
+const quotes = testimonials.filter((t) => t.quote);
+const bells = img('/media/art/bells_cluster.png', '(max-width: 760px) 90vw, 600px');
+const ld = [{ '@context': 'https://schema.org', '@type': 'Book', name: 'קולות פעמונים: כלים להתמודדות עם אתגרים בחינוך', author: { '@id': new URL(withBase('/#person'), Astro.site!).href }, inLanguage: 'he', datePublished: '2020', publisher: 'סטימצקי' },
+  { '@context': 'https://schema.org', '@type': 'Book', name: 'Growing the Orchids: The Innovative Educational Method to Help Kids Blossom', author: { '@id': new URL(withBase('/#person'), Astro.site!).href }, inLanguage: 'en', datePublished: '2021-02-09', numberOfPages: 146, url: settings.bookUrlEn },
+  { '@context': 'https://schema.org', '@type': 'Course', name: 'קולות פעמונים: התכנית הדיגיטלית', description: 'קורס דיגיטלי למורות ולמורים: ילדים מאתגרים, ניהול כיתה והתנהלות מול הורים.', url: settings.courseUrl, inLanguage: 'he', provider: { '@id': new URL(withBase('/#person'), Astro.site!).href } }];
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription} jsonld={ld}>
+  <PageHero kicker={p.kicker} title={p.title} intro={p.intro}>
+    <nav class="anchor-nav" aria-label="בעמוד">
+      {book.nav && <a href="#book">{book.nav}</a>}{course.nav && <a href="#course">{course.nav}</a>}{club.nav && <a href="#club">{club.nav}</a>}
+    </nav>
+  </PageHero>
+
+  <!-- book -->
+  <section class="section clip" id="book" data-parallax>
+    <Rings count={9} data-speed="0.1" style="width:1000px;left:-460px;top:50%;translate:0 -50%;opacity:.18" />
+    <div class="shell book-grid">
+      <div class="book-cover" data-reveal>
+        <div class="book-3d" data-speed="-0.08"><Img src={book.image} alt={book.imageAlt} sizes="(max-width: 860px) 60vw, 320px" /></div>
+        {book.imageCaption && <p class="frame-cap" style="text-align:center">{book.imageCaption}</p>}
+      </div>
+      <div data-reveal style="--d:.1s">
+        {book.kicker && <p class="kicker">{book.kicker}</p>}
+        {book.title && <h2 class="h2">{book.title}</h2>}
+        {book.lead && <p class="lead">{book.lead}</p>}
+        {book.paragraphs.map((t) => <p>{t}</p>)}
+        <div class="btn-row" style="margin-top:1.6rem">
+          {settings.bookUrlHe && book.buttonHe && <a class="btn" href={settings.bookUrlHe} target="_blank" rel="noopener">{book.buttonHe}<Icon name="ext" /></a>}
+          {settings.bookUrlEn && book.buttonEn && <a class="btn btn-ghost" href={settings.bookUrlEn} target="_blank" rel="noopener">{book.buttonEn}<Icon name="ext" /></a>}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- the four sentences -->
+  {sentences.items.length > 0 && (
+    <section class="section section-tight section-paper2 clip" data-parallax>
+      <div class="art sentences-art" data-speed="0.25" aria-hidden="true" style="width:min(40vw,560px);left:-4vw;top:8%;opacity:.5"><img src={bells.src} srcset={bells.srcset} sizes={bells.sizes} alt="" loading="lazy" decoding="async" /></div>
+      <div class="shell" style="position:relative">
+        <div class="narrow" style="margin-inline:0;max-width:760px" data-reveal>
+          {sentences.kicker && <p class="kicker">{sentences.kicker}</p>}
+          <ul class="orchid-lines">
+            {sentences.items.map((s) => <li>{s.says}: <span>{s.answer}</span></li>)}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- course -->
+  <section class="section" id="course">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        {course.kicker && <p class="kicker">{course.kicker}</p>}
+        {course.title && <h2 class="h2">{course.title}</h2>}
+        {course.lead && <p class="lead">{course.lead}</p>}
+        {course.paragraphs.map((t) => <p>{t}</p>)}
+      </div>
+      {course.stats.length > 0 && (
+        <ul class="stats course-stats" data-reveal>
+          {course.stats.map((s) => <li><strong>{s.value}</strong><span>{s.label}</span></li>)}
+        </ul>
+      )}
+      {course.who && <p class="course-who" data-reveal>{course.who}</p>}
+      <div class="two-col">
+        <ol class="steps" data-reveal>
+          {course.steps.map((s) => <li><h3>{s.title}</h3><p>{s.text}</p></li>)}
+        </ol>
+        <div data-reveal style="--d:.1s">
+          {course.lessonsTitle && <h3 class="h3">{course.lessonsTitle}</h3>}
+          <ol class="lessons">{course.lessons.map((l) => <li>{l}</li>)}</ol>
+          <div class="btn-row" style="margin-top:1.2rem">
+            <a class="btn btn-brass" href={settings.courseUrl} target="_blank" rel="noopener">{course.button}<Icon name="ext" /></a>
+          </div>
+        </div>
+      </div>
+      {quotes.map((t, i) => (
+        <figure class="card" style="margin:3rem 0 0;max-width:760px" data-reveal>
+          <blockquote class="pull" style="font-size:clamp(1.3rem,1.1rem + 1vw,1.9rem)">״{bareQuote(t.quote)}״</blockquote>
+          <figcaption class="pull-src">{t.role ? `${t.name}, ${t.role}` : t.name}{i === quotes.length - 1 && course.videosLink && <> · <a href={withBase('/video/#voices')}>{course.videosLink}</a></>}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+
+  <!-- club -->
+  <section class="section section-tight section-paper2" id="club">
+    <div class="shell two-col">
+      <div data-reveal>
+        {club.kicker && <p class="kicker">{club.kicker}</p>}
+        {club.title && <h2 class="h2">{club.title}</h2>}
+      </div>
+      <div data-reveal style="--d:.1s">
+        {club.text && <p class="lead">{club.text}</p>}
+      </div>
+    </div>
+  </section>
+
+  <ContactBand title={p.contactTitle} text={p.contactText} />
+</Base>

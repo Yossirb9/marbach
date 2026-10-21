@@ -1,0 +1,25 @@
+---
+// The night band at the bottom of most pages. Its texts come from layout.json (CMS: "תפריט, כותרת ותחתית");
+// a page may replace the title and the text with its own (contactTitle / contactText in the page's file).
+import Icon from './Icon.astro';
+import Rings from './Rings.astro';
+import { CONTACT, layout, withBase } from '../lib/data';
+interface Props { title?: string; text?: string }
+const band = layout.contactBand;
+const { title = band.title, text = band.text } = Astro.props;
+---
+<section class="section section-night contact-band" data-parallax>
+  <Rings count={12} data-speed="0.15" />
+  <div class="shell contact-band-grid">
+    <div data-reveal>
+      {band.kicker && <p class="kicker">{band.kicker}</p>}
+      {title && <h2 class="h2">{title}</h2>}
+      {text && <p class="lead">{text}</p>}
+    </div>
+    <div class="contact-band-actions" data-reveal style="--d:.1s">
+      <div class="btn-row"><a class="btn btn-wa" href={CONTACT.whatsapp()} target="_blank" rel="noopener"><Icon name="wa" />{band.whatsapp}</a><a class="btn btn-brass" href={withBase('/contact/')}>{band.form}</a></div>
+      <a class="contact-line" href={CONTACT.tel}><Icon name="phone" />{CONTACT.phone}</a>
+      <a class="contact-line" href={CONTACT.mailto}><Icon name="mail" />{CONTACT.email}</a>
+    </div>
+  </div>
+</section>

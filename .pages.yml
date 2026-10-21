@@ -1,0 +1,750 @@
+# Pages CMS (https://pagescms.org) — ממשק הניהול של האתר של ד"ר עפר מרבך.
+# נכנסים ב-https://app.pagescms.org (חשבון GitHub, או הזמנה במייל) ובוחרים את הריפו של האתר. כל שמירה היא commit,
+# ו-GitHub Actions (.github/workflows/deploy.yml) בונה ומעלה את האתר מחדש תוך כ-2 דקות.
+# כל התוכן נמצא ב-site/src/content. התבנית של כל סוג תוכן מוגדרת גם ב-site/src/content.config.ts: שמירה לא תקינה
+# מכשילה את הבנייה, והאתר החי נשאר בגרסה הקודמת.
+# תמונות: site/media (הבנייה ממירה ל-WebP בכמה גדלים). רק jpg/png/webp/gif: אלה הסוגים שהבנייה יודעת להמיר.
+# מדריך לעפר: docs/מדריך-ניהול-האתר.md
+
+media:
+  - name: images
+    label: תמונות
+    input: site/media
+    output: /media
+    extensions: [jpg, jpeg, png, webp, gif]
+    # Pages CMS בודק סיומות באותיות קטנות, ו-"safe" הופך שמות בעברית ל-file.jpg; "random" נותן לכל העלאה שם ייחודי
+    rename: random
+
+settings:
+  content:
+    merge: true
+
+components:
+  richText:
+    type: rich-text
+    options:
+      format: html
+      media: images
+  seoTitle:
+    label: כותרת לגוגל ולשיתוף
+    type: string
+    description: לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.
+  seoDescription:
+    label: תיאור לגוגל ולשיתוף
+    type: text
+    description: לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ.
+  internalNote:
+    label: הערה פנימית
+    type: text
+    description: לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.
+  image:
+    label: תמונה
+    type: image
+    options: { media: images }
+    description: בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.
+  imageAlt:
+    label: תיאור התמונה (לעיוורים)
+    type: string
+    description: משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.
+  youtube:
+    label: סרטון ביוטיוב
+    type: string
+    description: "מדביקים את הקישור לסרטון מיוטיוב (למשל https://www.youtube.com/watch?v=WEhm9eCATts), או רק את 11 התווים שאחרי v=. בטלפון: 'שיתוף' ← 'העתקת הקישור'."
+    pattern:
+      regex: "^([\\w-]{11}|https?://(www\\.|m\\.)?(youtube\\.com|youtu\\.be)/\\S+)$"
+      message: "קישור מיוטיוב, או 11 התווים שאחרי v= בקישור"
+  stat:
+    label: מספרים
+    type: object
+    list: { collapsible: { collapsed: true, summary: "{fields.value} {fields.label}" } }
+    description: "המספר הגדול והשורה שמתחתיו. אפשר להוסיף, למחוק ולגרור לשינוי הסדר."
+    fields:
+      - { name: value, label: המספר (גדול), type: string, description: "למשל 30+ או כחודש וחצי" }
+      - { name: label, label: השורה שמתחת, type: string }
+  source:
+    label: מקור
+    type: object
+    list: { collapsible: { collapsed: true, summary: "{fields.label}" } }
+    fields:
+      - { name: label, label: שם המקור, type: string, required: true }
+      - { name: url, label: קישור, type: string, required: true, pattern: { regex: "^https?://", message: "קישור מלא, שמתחיל ב-https://" } }
+
+content:
+  # ───────────── מאמרים ומחשבות ─────────────
+  - name: articles
+    label: מאמרים ומחשבות
+    description: "כל מאמר מקבל עמוד משלו, ומופיע בעמוד 'מאמרים ומחשבות' (החדש ראשון). שלושת האחרונים שיש להם תמונה מופיעים גם בדף הבית."
+    type: collection
+    path: site/src/content/articles
+    format: json
+    filename: "{fields.slug}.json"
+    view:
+      primary: title
+      fields: [title, date, draft]
+      sort: [date, title]
+      default: { sort: date, order: desc }
+    fields:
+      - { name: title, label: כותרת, type: string, required: true }
+      - name: slug
+        label: כתובת העמוד (באנגלית)
+        type: string
+        required: true
+        description: "מילה או שתיים באנגלית, באותיות קטנות ועם מקפים במקום רווחים. למשל: back-to-school. הכתובת תהיה /writing/back-to-school/"
+        pattern: { regex: "^[a-z0-9-]+$", message: "רק אותיות באנגלית קטנות, מספרים ומקפים" }
+      - { name: date, label: תאריך, type: date, required: true, options: { format: "yyyy-MM-dd" } }
+      - { name: draft, label: טיוטה (לא מוצג באתר), type: boolean, default: false, description: "מסמנים כדי לשמור בלי לפרסם. מורידים את הסימון כשהמאמר מוכן." }
+      - { name: excerpt, label: תקציר לכרטיס, type: text, description: "2-3 שורות שמופיעות בכרטיס של המאמר ובשיתוף בוואטסאפ" }
+      - { name: body, label: הטקסט, component: richText, description: "כותבים או מדביקים את המאמר. אפשר להדגיש, להוסיף קישורים, כותרות ותמונות." }
+      - { name: image, component: image, label: תמונה ראשית, description: "מופיעה בראש המאמר ובכרטיס שלו. לא חובה." }
+      - { name: imageAlt, component: imageAlt, description: "ריק = תמונה דקורטיבית בלבד" }
+      - { name: sourceUrl, label: קישור למקור (לא חובה), type: string, description: "אם המאמר פורסם קודם במקום אחר (למשל פוסט בפייסבוק), הקישור אליו", pattern: { regex: "^(https?://\\S+)?$", message: "קישור מלא, שמתחיל ב-https://" } }
+      - { name: sourceLabel, label: שם המקור, type: string, description: "למשל: פייסבוק: ד\"ר עפר מרבך" }
+      - { name: dateApprox, label: התאריך משוער, type: boolean, description: "מוסיף '(בקירוב)' ליד התאריך" }
+      - { name: truncated, label: הטקסט מקוצר, type: boolean, description: "לשימוש פנימי: מסמנים אם השמטנו חלק מהמקור" }
+
+  # ───────────── המלצות ─────────────
+  - name: testimonials
+    label: המלצות
+    description: "ציטוט, סרטון, או שניהם. ציטוטים מופיעים בדף הבית, בעמוד ההרצאות ובעמוד 'קולות פעמונים'; סרטונים בדף הבית (שלושת הראשונים) ובעמוד הווידאו. המלצות שמגיעות מהטופס 'כתבו המלצה' מעתיקים לכאן אחרי שעפר מאשר."
+    type: collection
+    path: site/src/content/testimonials
+    format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    view:
+      primary: name
+      fields: [name, role, order, hidden]
+      sort: [order, name]
+      default: { sort: order, order: asc }
+    fields:
+      - { name: name, label: שם, type: string, required: true }
+      - { name: role, label: תפקיד / קשר לעפר, type: string, description: "שורה אחת מתחת לשם. למשל: מורה בבית הספר ״אדם וסביבה״" }
+      - { name: quote, label: ההמלצה (ציטוט), type: text, description: "הטקסט עצמו, בלי מירכאות (האתר מוסיף אותן). אפשר להשאיר ריק אם יש רק סרטון." }
+      - { name: youtube, component: youtube, label: סרטון ביוטיוב (לא חובה), pattern: { regex: "^([\\w-]{11}|https?://(www\\.|m\\.)?(youtube\\.com|youtu\\.be)/\\S+)?$", message: "קישור מיוטיוב, או 11 התווים שאחרי v= בקישור" } }
+      - { name: poster, component: image, label: תמונה לסרטון (לא חובה), description: "ריק = התמונה של יוטיוב" }
+      - { name: order, label: סדר, type: number, description: "מספר קטן = מופיע קודם" }
+      - { name: hidden, label: להסתיר מהאתר, type: boolean, default: false, description: "מסמנים כדי להוריד מהאתר בלי למחוק" }
+
+  # ───────────── וידאו ─────────────
+  - name: videos
+    label: וידאו
+    description: "ההרצאות בעמוד הווידאו. סרטונים של משתתפים מספרים מוסיפים ב'המלצות'."
+    type: collection
+    path: site/src/content/videos
+    format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    view:
+      primary: title
+      fields: [poster, title, kind, order]
+      sort: [order, title]
+      default: { sort: order, order: asc }
+    fields:
+      - { name: title, label: כותרת, type: string, required: true }
+      - { name: youtube, component: youtube, required: true }
+      - name: kind
+        label: איפה מופיע
+        type: select
+        required: true
+        default: lecture
+        options:
+          values:
+            - { value: talk, label: "הסרטון הראשי בראש עמוד הווידאו (הרצאת ה-TEDx)" }
+            - { value: lecture, label: "הרצאות ומפגשים" }
+      - { name: order, label: סדר, type: number, description: "מספר קטן = מופיע קודם" }
+      - { name: featured, label: מוצג בדף הבית, type: boolean, description: "הסרטון שמופיע בדף הבית (מסמנים רק אחד)" }
+      - { name: poster, component: image, label: תמונה ממוזערת (לא חובה), description: "ריק = התמונה של יוטיוב" }
+      - { name: date, label: תאריך, type: date, default: "", options: { format: "yyyy-MM-dd" } }
+      - { name: duration, label: אורך, type: string, description: "למשל 9:56" }
+      - { name: channel, label: ערוץ / מקום, type: string, description: "מופיע מתחת לכותרת, למשל: הערוץ של עפר" }
+      - { name: description, label: תיאור קצר, type: text }
+
+  # ───────────── הרצאות וסדנאות ─────────────
+  - name: talks
+    label: הרצאות וסדנאות
+    description: כל הרצאה או שירות מופיעים בעמוד "הרצאות וסדנאות", במסלול של הקהל שלהם (וארבע הראשונות גם בכרטיס של המסלול בדף הבית).
+    type: collection
+    path: site/src/content/talks
+    format: json
+    filename: "{year}-{month}-{day}-{hour}{minute}{second}.json"
+    view:
+      primary: title
+      fields: [title, audience, order]
+      sort: [order, title]
+      default: { sort: order, order: asc }
+    fields:
+      - { name: title, label: שם ההרצאה, type: string, required: true }
+      - name: audience
+        label: קהל
+        type: select
+        required: true
+        options:
+          values:
+            - { value: staff, label: צוותי חינוך }
+            - { value: parents, label: הורים }
+            - { value: principals, label: מנהלים ומסגרות }
+            - { value: all, label: "מחנכים והורים (מופיע אצל צוותי החינוך)" }
+      - { name: order, label: סדר, type: number, description: "מספר קטן = מופיע קודם" }
+      - { name: summary, label: תיאור, type: text }
+      - { name: topics, label: נושאים / שאלות, type: string, list: true, description: "שורה לכל נושא. אפשר להוסיף, למחוק ולגרור." }
+      - { name: format, label: מתכונת, type: string, description: "למשל: הרצאה, או סדנה של כמה שעות" }
+      - { name: quote, label: ציטוט, type: string, description: "רק ציטוט אמיתי מתוך מקור" }
+      - { name: quoteSource, label: של מי הציטוט, type: string }
+      - { name: art, component: image, label: איור }
+      - { name: sources, label: מקורות (לא מוצג באתר), component: source }
+
+  # ───────────── העמודים הקבועים ─────────────
+  - name: site_pages
+    label: עמודי האתר
+    type: group
+    items:
+      - name: home
+        label: דף הבית
+        description: "כל הטקסטים של דף הבית, לפי הסדר שבו הם מופיעים. ההמלצות, ההרצאות, הסרטון והמאמרים נמשכים אוטומטית מהאזורים שלהם."
+        type: file
+        path: site/src/content/pages/home.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: השם הגדול בראש העמוד, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל השם, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - { name: heroImage, component: image, label: התמונה בפתיחה }
+          - { name: heroImageAlt, component: imageAlt }
+          - { name: heroButton, label: כפתור ראשון (להרצאות), type: string }
+          - { name: heroButton2, label: כפתור שני (ליצירת קשר), type: string }
+          - { name: quote, label: הציטוט מתחת לכפתורים, type: string }
+          - { name: quoteBy, label: של מי הציטוט, type: string }
+          - name: bell
+            label: סצנת הפעמון (נגלל)
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: intro, label: משפט הפתיחה, type: text }
+              - { name: lines, label: "שלוש השורות (חלש, חזק, חזק מאוד)", type: string, list: { min: 3, max: 3, collapsible: false }, description: "בדיוק שלוש שורות: כל צלצול של הפעמון כותב שורה אחת" }
+              - { name: title, label: הכותרת שהאותיות שלה מתאספות, type: string, description: "קצר: שתיים-שלוש מילים" }
+              - { name: sub, label: המשפט שמתחת לכותרת, type: text }
+              - { name: button, label: הכפתור (לעמוד הווידאו), type: string }
+              - { name: link, label: הקישור (לשלושת האיתותים), type: string }
+              - { name: hint, label: הרמז לגלול, type: string }
+          - name: signals
+            label: שלושת האיתותים
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה, type: text }
+              - name: items
+                label: האיתותים
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{fields.title}" } }
+                description: "המספרים (01, 02, 03) נוספים לבד לפי הסדר"
+                fields:
+                  - { name: title, label: שם, type: string }
+                  - { name: sub, label: שורת משנה, type: string }
+                  - { name: text, label: הסבר, type: text }
+              - { name: link, label: הקישור לסרטון, type: string }
+          - name: about
+            label: קצת עליו
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה, type: text }
+              - { name: stats, component: stat }
+              - { name: link, label: הקישור לעמוד אודות, type: string }
+              - { name: image, component: image }
+              - { name: imageAlt, component: imageAlt }
+          - name: tracks
+            label: איך עובדים עם עפר (שלושת המסלולים)
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - name: items
+                label: המסלולים
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{fields.title}" } }
+                description: "בכל כרטיס מופיעות אוטומטית עד ארבע הרצאות של הקהל הזה (מתוך 'הרצאות וסדנאות')"
+                fields:
+                  - name: audience
+                    label: קהל
+                    type: select
+                    options:
+                      values:
+                        - { value: staff, label: צוותי חינוך }
+                        - { value: parents, label: הורים }
+                        - { value: principals, label: מנהלים ומסגרות }
+                  - { name: title, label: כותרת, type: string }
+                  - { name: text, label: טקסט, type: text }
+                  - { name: art, component: image, label: איור }
+              - { name: link, label: המילה בתחתית הכרטיס, type: string }
+          - name: tedx
+            label: הרצאת ה-TEDx
+            type: object
+            description: "הסרטון עצמו: הסרטון שסומן 'מוצג בדף הבית' באזור 'וידאו'"
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה, type: text }
+              - { name: button, label: הכפתור, type: string }
+          - name: book
+            label: הספר והקורס
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה ראשונה, type: text }
+              - { name: text, label: פסקה שנייה, type: text }
+              - { name: image, component: image, label: הכריכה }
+              - { name: imageAlt, component: imageAlt }
+              - { name: button, label: כפתור ראשון (לעמוד קולות פעמונים), type: string }
+              - { name: button2, label: כפתור שני (לאתר הקורס), type: string }
+          - name: testimonials
+            label: ממליצים
+            type: object
+            description: "ההמלצות עצמן: באזור 'המלצות'"
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה, type: text }
+              - { name: videosLink, label: הקישור לכל הסרטונים, type: string }
+              - { name: writeLink, label: הכפתור 'כתבו המלצה', type: string }
+          - name: writing
+            label: מהכתיבה של עפר
+            type: object
+            description: "המאמרים עצמם: באזור 'מאמרים ומחשבות'"
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה, type: text }
+              - { name: link, label: הקישור לכל המאמרים, type: string }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+          - { name: note, component: internalNote }
+
+      - name: lectures
+        label: הרצאות וסדנאות (העמוד)
+        description: "הטקסטים של העמוד. ההרצאות עצמן: באזור 'הרצאות וסדנאות'."
+        type: file
+        path: site/src/content/pages/lectures.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - name: tracks
+            label: המסלולים
+            type: object
+            list: { collapsible: { collapsed: true, summary: "{fields.title}" } }
+            description: "כל מסלול הוא אזור בעמוד עם ההרצאות של הקהל שלו. הסדר כאן הוא הסדר בעמוד."
+            fields:
+              - name: audience
+                label: קהל
+                type: select
+                required: true
+                options:
+                  values:
+                    - { value: staff, label: צוותי חינוך }
+                    - { value: parents, label: הורים }
+                    - { value: principals, label: מנהלים ומסגרות }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה, type: text }
+          - name: testimonials
+            label: ממליצים
+            type: object
+            description: "מופיע אחרי המסלולים כשיש המלצות עם ציטוט"
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: writeLink, label: הכפתור 'כתבו המלצה', type: string }
+          - { name: contactTitle, label: כותרת הפס הכהה בתחתית, type: string, description: "ריק = הכותרת הרגילה" }
+          - { name: contactText, label: הטקסט בפס הכהה בתחתית, type: text }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+          - { name: note, component: internalNote }
+
+      - name: book
+        label: קולות פעמונים (הספר, הקורס והמועדון)
+        type: file
+        path: site/src/content/pages/book.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - name: book
+            label: הספר
+            type: object
+            fields:
+              - { name: nav, label: שם הכפתור בראש העמוד, type: string }
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה מודגשת, type: text }
+              - { name: paragraphs, label: פסקאות, type: text, list: true }
+              - { name: image, component: image, label: הכריכה }
+              - { name: imageAlt, component: imageAlt }
+              - { name: imageCaption, label: כיתוב מתחת לכריכה, type: string }
+              - { name: buttonHe, label: הכפתור לספר בעברית, type: string, description: "הקישור עצמו: בהגדרות האתר" }
+              - { name: buttonEn, label: הכפתור לספר באנגלית, type: string }
+          - name: sentences
+            label: ארבעה משפטים שפותחים את הספר
+            type: object
+            fields:
+              - { name: kicker, label: כותרת קטנה, type: string }
+              - name: items
+                label: המשפטים
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{fields.says}" } }
+                fields:
+                  - { name: says, label: מה אומרים, type: string, description: "כולל המירכאות, למשל ״לילד יש קשיים רגשיים״" }
+                  - { name: answer, label: התשובה (מודגשת), type: string }
+          - name: course
+            label: הקורס הדיגיטלי
+            type: object
+            fields:
+              - { name: nav, label: שם הכפתור בראש העמוד, type: string }
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: lead, label: פסקה מודגשת, type: text }
+              - { name: paragraphs, label: פסקאות, type: text, list: true }
+              - { name: stats, component: stat }
+              - { name: who, label: מי השתתף, type: text }
+              - name: steps
+                label: שלבי השיטה
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{fields.title}" } }
+                fields:
+                  - { name: title, label: שם השלב, type: string }
+                  - { name: text, label: הסבר, type: text }
+              - { name: lessonsTitle, label: כותרת רשימת השיעורים, type: string }
+              - { name: lessons, label: השיעורים, type: string, list: true, description: "שורה לכל שיעור. אפשר להוסיף, למחוק ולגרור." }
+              - { name: button, label: כפתור ההרשמה, type: string, description: "הקישור עצמו: 'אתר הקורס הדיגיטלי' בהגדרות" }
+              - { name: videosLink, label: הקישור מתחת להמלצה, type: string, description: "ההמלצות עצמן (ציטוטים): באזור 'המלצות'" }
+          - name: club
+            label: המועדון
+            type: object
+            fields:
+              - { name: nav, label: שם הכפתור בראש העמוד, type: string }
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: text, label: פסקה, type: text }
+          - { name: contactTitle, label: כותרת הפס הכהה בתחתית, type: string, description: "ריק = הכותרת הרגילה" }
+          - { name: contactText, label: הטקסט בפס הכהה בתחתית, type: text }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+          - { name: note, component: internalNote }
+
+      - name: video_page
+        label: וידאו ותקשורת (העמוד)
+        description: "הטקסטים של העמוד. הסרטונים: באזור 'וידאו'. משתתפים מספרים: באזור 'המלצות'."
+        type: file
+        path: site/src/content/pages/video.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - name: tedx
+            label: הסרטון הראשי
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה (לפני החודש והשנה), type: string }
+              - { name: durationNote, label: אחרי אורך הסרטון, type: string }
+          - name: lectures
+            label: הרצאות ומפגשים
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+          - name: voices
+            label: קולות מהשטח
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: youtubeLink, label: הקישור לערוץ היוטיוב, type: string }
+          - name: press
+            label: בתקשורת
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - name: items
+                label: הופעות בתקשורת
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{fields.title}" } }
+                fields:
+                  - { name: title, label: כותרת, type: string, required: true }
+                  - { name: text, label: איפה ומתי, type: string }
+                  - { name: url, label: קישור, type: string, required: true, pattern: { regex: "^https?://", message: "קישור מלא, שמתחיל ב-https://" } }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+          - { name: note, component: internalNote }
+
+      - name: writing_page
+        label: מאמרים ומחשבות (העמוד)
+        description: "הטקסטים של העמוד. המאמרים עצמם: באזור 'מאמרים ומחשבות'."
+        type: file
+        path: site/src/content/pages/writing.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - { name: facebookNote, label: המשפט על דף הפייסבוק, type: text }
+          - { name: facebookButton, label: כפתור הפייסבוק, type: string }
+          - name: article
+            label: מילים בעמוד של כל מאמר
+            type: object
+            fields:
+              - { name: approx, label: ליד תאריך משוער, type: string }
+              - { name: newer, label: קישור למאמר החדש יותר, type: string }
+              - { name: older, label: קישור למאמר הקודם, type: string }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+          - { name: note, component: internalNote }
+
+      - name: about
+        label: אודות
+        type: file
+        path: site/src/content/pages/about.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - name: story
+            label: איך נולדה הגישה
+            type: object
+            fields:
+              - { name: title, label: כותרת, type: string }
+              - name: blocks
+                label: הסיפור
+                type: block
+                list: true
+                blockKey: type
+                description: "פסקה אחרי פסקה. מוסיפים 'פסקה' או 'ציטוט', ואפשר לגרור לשינוי הסדר."
+                blocks:
+                  - name: paragraph
+                    label: פסקה
+                    fields:
+                      - { name: text, label: טקסט, type: text }
+                  - name: quote
+                    label: ציטוט
+                    fields:
+                      - { name: text, label: הציטוט (עם המירכאות), type: text }
+                      - { name: cite, label: של מי, type: string }
+              - { name: image, component: image }
+              - { name: imageAlt, component: imageAlt }
+              - { name: button, label: הכפתור מתחת לתמונה, type: string }
+          - name: facts
+            label: תחנות ועובדות
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - name: items
+                label: העובדות
+                type: object
+                list: { collapsible: { collapsed: true, summary: "{fields.title}" } }
+                fields:
+                  - { name: title, label: כותרת, type: string, required: true }
+                  - { name: text, label: טקסט, type: text }
+                  - { name: source, label: קישור למקור (לא מוצג באתר), type: string }
+          - name: field
+            label: גם בשטח (התמונה עם הילדים)
+            type: object
+            fields:
+              - { name: kicker, label: שורה קטנה, type: string }
+              - { name: title, label: כותרת, type: string }
+              - { name: image, component: image, description: "ריק = האזור לא מוצג" }
+              - { name: imageAlt, component: imageAlt }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+          - { name: note, component: internalNote }
+
+      - name: contact
+        label: יצירת קשר
+        description: "הטלפון, המייל והפייסבוק עצמם: ב'פרטי קשר והגדרות'"
+        type: file
+        path: site/src/content/pages/contact.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - name: form
+            label: הטופס
+            type: object
+            fields:
+              - { name: name, label: שדה השם, type: string }
+              - { name: org, label: שדה בית ספר / ארגון, type: string }
+              - { name: phone, label: שדה הטלפון, type: string }
+              - { name: email, label: שדה המייל, type: string }
+              - { name: topic, label: שדה הנושא, type: string }
+              - { name: topics, label: האפשרויות בשדה הנושא, type: string, list: true }
+              - { name: message, label: שדה ההודעה, type: string }
+              - { name: messagePlaceholder, label: הטקסט האפור בשדה ההודעה, type: string }
+              - { name: button, label: כפתור השליחה, type: string }
+              - { name: note, label: ההערה מתחת לכפתור, type: text, description: "המילה {email} מוחלפת בכתובת המייל מההגדרות" }
+          - name: direct
+            label: או ישירות
+            type: object
+            fields:
+              - { name: title, label: כותרת, type: string }
+              - { name: whatsapp, label: קישור הוואטסאפ, type: string }
+              - { name: facebook, label: קישור הפייסבוק, type: string }
+          - { name: note, label: הערה מתחת לפרטי הקשר, type: text, description: "לא חובה. מוצגת באתר." }
+          - name: recommend
+            label: הקישור לכתיבת המלצה
+            type: object
+            fields:
+              - { name: text, label: השאלה, type: string }
+              - { name: link, label: הקישור, type: string }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+
+      - name: recommend
+        label: כתבו המלצה (הטופס)
+        description: "הטופס שבו אנשים כותבים המלצה. הוא פותח וואטסאפ (או מייל) לעפר עם ההמלצה כתובה; שום דבר לא נשמר באתר. כדי לפרסם המלצה שהתקבלה מוסיפים אותה באזור 'המלצות'."
+        type: file
+        path: site/src/content/pages/recommend.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: kicker, label: שורה קטנה מעל הכותרת, type: string }
+          - { name: intro, label: פסקת פתיחה, type: text }
+          - name: form
+            label: הטופס
+            type: object
+            fields:
+              - { name: name, label: שדה השם, type: string }
+              - { name: role, label: שדה התפקיד, type: string }
+              - { name: rolePlaceholder, label: הטקסט האפור בשדה התפקיד, type: string }
+              - { name: text, label: שדה ההמלצה, type: string }
+              - { name: consent, label: תיבת האישור לפרסום, type: string }
+              - { name: whatsappButton, label: כפתור הוואטסאפ, type: string }
+              - { name: mailButton, label: כפתור המייל, type: string }
+              - { name: note, label: ההערה מתחת לכפתורים, type: string }
+              - { name: messageIntro, label: השורה הראשונה בהודעה שמגיעה לעפר, type: string }
+              - { name: mailSubject, label: נושא המייל, type: string }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+
+      - name: accessibility
+        label: הצהרת נגישות
+        type: file
+        path: site/src/content/pages/accessibility.json
+        format: json
+        operations: { delete: false }
+        fields:
+          - { name: title, label: כותרת, type: string, required: true }
+          - { name: body, label: הטקסט, component: richText }
+          - { name: seoTitle, component: seoTitle }
+          - { name: seoDescription, component: seoDescription }
+
+  # ───────────── תפריט, כותרת ותחתית ─────────────
+  - name: layout
+    label: תפריט, כותרת ותחתית
+    description: "מה שמופיע בכל העמודים: התפריט, הכפתור בראש העמוד, הפס הכהה 'רוצים את עפר אצלכם?', התחתית ועמוד 404."
+    type: file
+    path: site/src/content/layout.json
+    format: json
+    operations: { delete: false }
+    fields:
+      - name: menu
+        label: התפריט
+        type: object
+        list: { collapsible: { collapsed: true, summary: "{fields.label}" } }
+        description: "הסדר כאן הוא הסדר בתפריט. אפשר לגרור, למחוק עמוד מהתפריט או להוסיף. בתחתית האתר מופיעים כל העמודים שבתפריט חוץ מדף הבית ויצירת קשר."
+        fields:
+          - name: link
+            label: עמוד
+            type: select
+            required: true
+            options:
+              values:
+                - { value: "/", label: דף הבית }
+                - { value: "/lectures/", label: הרצאות וסדנאות }
+                - { value: "/kolot-paamonim/", label: קולות פעמונים }
+                - { value: "/video/", label: וידאו }
+                - { value: "/writing/", label: מאמרים ומחשבות }
+                - { value: "/about/", label: אודות }
+                - { value: "/contact/", label: יצירת קשר }
+                - { value: "/recommend/", label: כתבו המלצה }
+                - { value: "/accessibility/", label: הצהרת נגישות }
+          - { name: label, label: השם בתפריט, type: string, required: true }
+          - { name: note, label: שורה קטנה מתחת לשם (בתפריט בטלפון), type: string }
+      - name: header
+        label: ראש העמוד
+        type: object
+        fields:
+          - { name: button, label: הכפתור בראש העמוד, type: string }
+          - { name: menuTitle, label: הכותרת בתחתית התפריט בטלפון, type: string }
+          - { name: menuWhatsapp, label: כפתור וואטסאפ בתפריט, type: string }
+          - { name: menuPhone, label: כפתור טלפון בתפריט, type: string }
+          - { name: menuEmail, label: כפתור מייל בתפריט, type: string }
+      - name: contactBand
+        label: הפס הכהה בתחתית העמודים
+        type: object
+        fields:
+          - { name: kicker, label: שורה קטנה, type: string }
+          - { name: title, label: כותרת, type: string }
+          - { name: text, label: טקסט, type: text }
+          - { name: whatsapp, label: כפתור הוואטסאפ, type: string }
+          - { name: form, label: כפתור הטופס, type: string }
+      - { name: whatsappMessage, label: ההודעה שנפתחת בוואטסאפ, type: string, description: "הטקסט שכבר כתוב כשמישהו לוחץ על וואטסאפ באתר" }
+      - name: footer
+        label: התחתית
+        type: object
+        fields:
+          - { name: text, label: המשפט מתחת לשם, type: text }
+          - { name: pagesTitle, label: כותרת רשימת העמודים, type: string }
+          - { name: contactTitle, label: כותרת יצירת הקשר, type: string }
+          - { name: whatsapp, label: קישור הוואטסאפ, type: string }
+          - { name: form, label: קישור לטופס הפנייה, type: string }
+          - { name: recommend, label: קישור ל'כתבו המלצה', type: string, description: "ריק = לא מופיע" }
+          - { name: course, label: קישור לקורס, type: string }
+          - { name: copyright, label: זכויות יוצרים, type: string }
+          - { name: accessibility, label: קישור להצהרת הנגישות, type: string }
+      - name: notFound
+        label: עמוד 404 (כתובת שלא קיימת)
+        type: object
+        fields:
+          - { name: pageTitle, label: הכותרת בלשונית, type: string }
+          - { name: kicker, label: שורה קטנה, type: string }
+          - { name: title, label: כותרת, type: string }
+          - { name: text, label: טקסט, type: text }
+          - { name: button, label: הכפתור, type: string }
+
+  # ───────────── פרטי קשר והגדרות ─────────────
+  - name: settings
+    label: פרטי קשר והגדרות
+    description: "הטלפון והמייל מופיעים בכל האתר: בתפריט, בפס הכהה, בתחתית ובטופס. משנים כאן פעם אחת."
+    type: file
+    path: site/src/content/settings.json
+    format: json
+    operations: { delete: false }
+    fields:
+      - { name: siteName, label: שם האתר, type: string, required: true, description: "מופיע בראש כל עמוד ובלשונית הדפדפן" }
+      - { name: siteTagline, label: סלוגן, type: string, description: "מופיע ליד השם: פשוט מחנך" }
+      - { name: role, label: תפקיד (לגוגל), type: string }
+      - name: phone
+        label: טלפון (גם לוואטסאפ)
+        type: string
+        required: true
+        pattern: { regex: "^0\\d{1,2}-?\\d{3}-?\\d{4}$", message: "מספר ישראלי, למשל 050-313-7261" }
+      - { name: email, label: מייל, type: string, required: true, description: "לכאן מגיעות הפניות מהטופס" }
+      - { name: facebook, label: דף הפייסבוק, type: string }
+      - { name: youtube, label: ערוץ היוטיוב, type: string }
+      - { name: courseUrl, label: אתר הקורס הדיגיטלי, type: string, required: true }
+      - { name: bookUrlHe, label: קישור לספר בעברית, type: string }
+      - { name: bookUrlEn, label: קישור לספר באנגלית, type: string }
+      - { name: podcastUrl, label: קישור לפודקאסט, type: string }
+      - { name: noindex, label: "להסתיר מגוגל (עד אישור)", type: boolean, description: "כל עוד מסומן, גוגל לא מאנדקס את האתר" }

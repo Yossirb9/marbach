@@ -1,0 +1,11 @@
+---
+import { img } from '../lib/data';
+interface Props { src: string; alt: string; sizes?: string; class?: string; eager?: boolean; lightbox?: boolean; style?: string; [k: `data-${string}`]: unknown }
+const { src, alt, sizes, class: cls, eager = false, lightbox = false, style, ...rest } = Astro.props;
+const a = img(src, sizes);
+const attrs = {
+  src: a.src, srcset: a.srcset, sizes: a.sizes, width: a.width, height: a.height, alt,
+  loading: eager ? 'eager' : 'lazy', decoding: eager ? 'sync' : 'async', fetchpriority: eager ? 'high' : undefined, class: cls, style, ...rest,
+} as const;
+---
+{lightbox ? <a href={a.full} data-lightbox aria-label={alt ? `הגדלת התמונה: ${alt}` : 'הגדלת התמונה'}><img {...attrs} /></a> : <img {...attrs} />}

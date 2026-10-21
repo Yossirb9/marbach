@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { page, settings, CONTACT, withBase } from '../lib/data';
+// every text on this page: src/content/pages/contact.json (CMS: עמודי האתר → יצירת קשר); phone/mail: settings.json
+const p = await page('contact');
+const { form: f, direct, recommend } = p;
+// "{email}" in the note is replaced by the address from the settings
+const [noteBefore, noteAfter] = f.note.includes('{email}') ? f.note.split('{email}', 2) : [f.note, ''];
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription}>
+  <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/art/letter.png" />
+  <section class="section">
+    <div class="shell contact-grid">
+      <form class="form card" data-contact data-email={settings.email} novalidate>
+        <div class="field"><label for="f-name">{f.name}</label><input id="f-name" name="name" data-label="שם" required autocomplete="name" /></div>
+        <div class="field"><label for="f-org">{f.org}</label><input id="f-org" name="org" data-label="ארגון" autocomplete="organization" /></div>
+        <div class="field"><label for="f-phone">{f.phone}</label><input id="f-phone" name="phone" data-label="טלפון" type="tel" inputmode="tel" required autocomplete="tel" /></div>
+        <div class="field"><label for="f-email">{f.email}</label><input id="f-email" name="email" data-label="אימייל" type="email" autocomplete="email" /></div>
+        {f.topics.length > 0 && <div class="field"><label for="f-topic">{f.topic}</label>
+          <select id="f-topic" name="topic" data-label="נושא">{f.topics.map((t) => <option>{t}</option>)}</select></div>}
+        <div class="field"><label for="f-msg">{f.message}</label><textarea id="f-msg" name="message" data-label="הודעה" placeholder={f.messagePlaceholder}></textarea></div>
+        <p class="form-error" data-form-error role="alert"></p>
+        <button class="btn btn-brass" type="submit"><Icon name="mail" />{f.button}</button>
+        {f.note && <p class="form-note">{noteBefore}{f.note.includes('{email}') && settings.email}{noteAfter}</p>}
+      </form>
+      <div>
+        {direct.title && <h2 class="h3">{direct.title}</h2>}
+        <ul class="contact-lines">
+          <li><a href={CONTACT.whatsapp()} target="_blank" rel="noopener"><Icon name="wa" />{direct.whatsapp}</a></li>
+          <li><a href={CONTACT.tel}><Icon name="phone" /><span dir="ltr">{CONTACT.phone}</span></a></li>
+          <li><a href={CONTACT.mailto}><Icon name="mail" />{CONTACT.email}</a></li>
+          {settings.facebook && <li><a href={settings.facebook} target="_blank" rel="noopener"><Icon name="fb" />{direct.facebook}</a></li>}
+        </ul>
+        {p.note && <p class="small muted" style="margin-top:1.6rem">{p.note}</p>}
+        {recommend.link && <p class="contact-recommend">{recommend.text && <>{recommend.text} </>}<a href={withBase('/recommend/')}>{recommend.link}</a></p>}
+      </div>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,21 @@
+# dependencies and build output
+node_modules/
+site/dist/
+.astro/
+site/.astro/
+
+# working material that is not part of the site (stays on the build machine only)
+scrape/
+media_originals/
+qa/
+_backup_pre_hero/
+facts.md
+content_inventory.md
+# the generated drawings' sources: only `npm run assets` (one-off) reads them; the build uses site/media
+assets-src/
+
+# secrets
+.env
+.env.*
+*.env
+.secrets*

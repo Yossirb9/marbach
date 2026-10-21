@@ -1,0 +1,30 @@
+---
+// "כתבו המלצה": a visitor writes a recommendation; it is sent to Ofer on WhatsApp (or by mail) already written.
+// Nothing is stored on the site and no form service is involved. Ofer publishes it himself in the CMS (המלצות).
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { page, settings, CONTACT } from '../lib/data';
+// every text on this page: src/content/pages/recommend.json (CMS: עמודי האתר → כתבו המלצה)
+const p = await page('recommend');
+const f = p.form;
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription}>
+  <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/art/letter.png" />
+  <section class="section">
+    <div class="shell recommend-grid">
+      <form class="form card" data-recommend data-wa={CONTACT.waBase} data-email={settings.email} data-intro={f.messageIntro} data-subject={f.mailSubject} novalidate>
+        <div class="field"><label for="r-name">{f.name}</label><input id="r-name" name="name" data-label={f.name} required autocomplete="name" /></div>
+        <div class="field"><label for="r-role">{f.role}</label><input id="r-role" name="role" data-label={f.role} placeholder={f.rolePlaceholder} /></div>
+        <div class="field"><label for="r-text">{f.text}</label><textarea id="r-text" name="text" data-label={f.text} required></textarea></div>
+        <label class="field-check"><input type="checkbox" name="consent" data-label={f.consent} value="yes" />{f.consent}</label>
+        <p class="form-error" data-form-error role="alert"></p>
+        <div class="btn-row">
+          <button class="btn btn-wa" type="submit" data-send="wa"><Icon name="wa" />{f.whatsappButton}</button>
+          <button class="btn btn-ghost" type="submit" data-send="mail"><Icon name="mail" />{f.mailButton}</button>
+        </div>
+        {f.note && <p class="form-note">{f.note}</p>}
+      </form>
+    </div>
+  </section>
+</Base>

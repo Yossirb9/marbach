@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import Img from '../../components/Img.astro';
+import Icon from '../../components/Icon.astro';
+import Rings from '../../components/Rings.astro';
+import ContactBand from '../../components/ContactBand.astro';
+import { articles, heDate, articleUrl, withBase, page, settings, richHtml } from '../../lib/data';
+
+export function getStaticPaths() {
+  // articles is a top-level await in lib/data; Astro resolves it before calling getStaticPaths
+  return articles.map((a, i) => ({ params: { slug: a.slug }, props: { i } }));
+}
+const { i } = Astro.props as { i: number };
+const w = await page('writing');
+const a = articles[i];
+const newer = articles[i - 1], older = articles[i + 1];
+const ld = [{ '@context': 'https://schema.org', '@type': 'Article', headline: a.title, datePublished: a.date, inLanguage: 'he',
+  author: { '@id': new URL(withBase('/#person'), Astro.site!).href }, isBasedOn: a.sourceUrl }];
+---
+<Base title={`${a.title} | ${settings.siteName}`} description={a.excerpt} image={a.image ?? '/media/art/og-plate.jpg'} jsonld={ld}>
+  <section class="page-hero article-head">
+    <Rings count={9} />
+    <div class="narrow" style="position:relative">
+      <p class="kicker"><a href={withBase('/writing/')} style="color:inherit;text-decoration:none">{w.title}</a></p>
+      <h1>{a.title}</h1>
+      <p class="article-meta">
+        <span>{settings.siteName}</span>
+        <time datetime={a.date}>{heDate(a.date)}{a.dateApprox && w.article.approx && ` ${w.article.approx}`}</time>
+      </p>
+    </div>
+  </section>
+  <section class="section section-tight">
+    <div class="narrow">
+      {a.image && <figure class="article-figure" aria-hidden={a.imageAlt ? undefined : 'true'}><Img src={a.image} alt={a.imageAlt} sizes="(max-width: 760px) 100vw, 760px" /></figure>}
+      <div class="prose" set:html={richHtml(a.body)} />
+      <nav class="article-nav" aria-label="מאמרים נוספים">
+        {newer ? <a href={articleUrl(newer.slug)}><small>{w.article.newer}</small><strong>{newer.title}</strong></a> : <span />}
+        {older ? <a href={articleUrl(older.slug)}><small>{w.article.older}</small><strong>{older.title}</strong></a> : <span />}
+      </nav>
+    </div>
+  </section>
+  <ContactBand />
+</Base>

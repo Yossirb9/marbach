@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import Rings from '../components/Rings.astro';
+import { withBase, layout, settings } from '../lib/data';
+// texts: src/content/layout.json → notFound (CMS: תפריט, כותרת ותחתית)
+const t = layout.notFound;
+---
+<Base title={`${t.pageTitle} | ${settings.siteName}`}>
+  <section class="page-hero" style="min-height:80vh;display:flex;align-items:center">
+    <Rings count={10} />
+    <div class="shell">
+      <div class="page-hero-copy">
+        {t.kicker && <p class="kicker">{t.kicker}</p>}
+        <h1>{t.title}</h1>
+        {t.text && <p class="lead">{t.text}</p>}
+        <a class="btn" href={withBase('/')}>{t.button}</a>
+      </div>
+    </div>
+  </section>
+</Base>

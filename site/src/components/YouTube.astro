@@ -1,0 +1,26 @@
+---
+// YouTube facade: a poster and a button; the iframe (youtube-nocookie) is created only on click.
+// The poster is a local image from the media library when one was chosen; otherwise YouTube's own thumbnail, so a video
+// added in the CMS with nothing but its id still gets a picture.
+import Icon from './Icon.astro';
+import { img, heMonth, type Video } from '../lib/data';
+interface Props { video: Video; meta?: boolean; sizes?: string; eager?: boolean }
+const { video, meta = true, sizes = '(max-width: 760px) 100vw, 760px', eager = false } = Astro.props;
+const p = video.poster ? img(video.poster, sizes) : null;
+const metaLine = [video.channel, video.date && heMonth(video.date), video.duration].filter(Boolean).join(' · ');
+---
+<figure style="margin:0">
+  <div class="yt" data-yt={video.youtube} data-title={video.title}>
+    <button type="button" aria-label={`ניגון ביוטיוב: ${video.title}`}>
+      {p ? <img src={p.src} srcset={p.srcset} sizes={p.sizes} width={p.width} height={p.height} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+         : <img src={`https://i.ytimg.com/vi/${video.youtube}/hqdefault.jpg`} width="480" height="360" alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />}
+      <span class="play"><Icon name="play" /></span>
+    </button>
+  </div>
+  {meta && (
+    <figcaption class="yt-meta">
+      <h3>{video.title}</h3>
+      {metaLine && <p>{metaLine}</p>}
+    </figcaption>
+  )}
+</figure>

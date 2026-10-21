@@ -1,0 +1,126 @@
+---
+import '../styles/global.css';
+import '../styles/pages.css';
+import Icon from '../components/Icon.astro';
+import { settings, layout, CONTACT, MENU, img, withBase } from '../lib/data';
+// preload the subsets the first screen uses, so the late font swap does not shift the hero (CLS)
+import frankHe from '@fontsource-variable/frank-ruhl-libre/files/frank-ruhl-libre-hebrew-wght-normal.woff2?url';
+import assistantHe from '@fontsource-variable/assistant/files/assistant-hebrew-wght-normal.woff2?url';
+
+interface Props { title: string; description?: string; image?: string; jsonld?: object[]; bodyClass?: string }
+const { title, description = '', image = '/media/art/og-plate.jpg', jsonld = [], bodyClass } = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(img(image).at(1200), site).href;
+const path = Astro.url.pathname;
+const { header, footer } = layout;
+// the footer's "באתר" list: the menu without the home page and the contact page (both have their own links)
+const footerPages = MENU.filter((m) => m.path !== '/' && m.path !== '/contact/');
+const person = {
+  '@context': 'https://schema.org', '@type': 'Person', '@id': new URL(withBase('/#person'), site).href,
+  name: 'ד״ר עפר מרבך', alternateName: 'Dr. Ofer Marbach', honorificPrefix: 'ד״ר',
+  url: new URL(withBase('/'), site).href, image: new URL(img('/media/photos/ofer-tedx-letters.jpg').at(720), site).href,
+  jobTitle: settings.role, description: 'מרצה, יועץ חינוכי ומדריך הורים. מחבר הספר ״קולות פעמונים״.',
+  telephone: '+972-' + settings.phone.replace(/^0/, ''), email: settings.email,
+  knowsAbout: ['חינוך', 'הדרכת הורים', 'ניהול כיתה', 'חינוך מיוחד', 'חינוך מונטסורי', 'מנהיגות חינוכית'],
+  sameAs: [settings.facebook, settings.youtube, settings.courseUrl].filter(Boolean),
+};
+const ld = [person, ...jsonld];
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  {description && <meta name="description" content={description} />}
+  {settings.noindex && <meta name="robots" content="noindex, nofollow" />}
+  <link rel="canonical" href={canonical} />
+  <meta name="theme-color" content="#f5efe4" />
+  <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+  <link rel="preload" href={frankHe} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={assistantHe} as="font" type="font/woff2" crossorigin />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="he_IL" />
+  <meta property="og:site_name" content="ד״ר עפר מרבך" />
+  <meta property="og:title" content={title} />
+  {description && <meta property="og:description" content={description} />}
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+  <!-- before first paint: scenes and reveals start in their "before" state (CSS under html.js), never flashing the final one -->
+  <script is:inline>document.documentElement.classList.add('js')</script>
+</head>
+<body class={bodyClass}>
+  <a class="skip" href="#main">דילוג לתוכן</a>
+  <header class="site-header" data-header>
+    <div class="shell">
+      <a class="brand" href={withBase('/')} aria-label={`${settings.siteName}, לדף הבית`}>
+        <Icon name="bell" />
+        <span class="brand-text"><span class="brand-name">{settings.siteName}</span><span class="brand-tag">{settings.siteTagline}</span></span>
+      </a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="nav" data-burger><span></span><span></span><span></span><span class="sr-only">תפריט</span></button>
+      <nav class="nav" id="nav" aria-label="ראשי" data-nav data-lenis-prevent>
+        {MENU.map((m, i) => (
+          <a class:list={['nav-item', m.path === '/' && 'nav-home']} href={m.href} aria-current={path === m.href ? 'page' : undefined}>
+            <span class="nav-label">{m.label}</span>
+            {m.note && <span class="nav-note">{m.note}</span>}
+          </a>
+        ))}
+        <div class="nav-foot">
+          {header.menuTitle && <p class="nav-foot-title">{header.menuTitle}</p>}
+          <div class="nav-foot-btns">
+            <a class="btn btn-wa" href={CONTACT.whatsapp()} target="_blank" rel="noopener"><Icon name="wa" />{header.menuWhatsapp}</a>
+            <a class="btn" href={CONTACT.tel}><Icon name="phone" />{header.menuPhone}</a>
+            <a class="btn btn-ghost" href={CONTACT.mailto}><Icon name="mail" />{header.menuEmail}</a>
+          </div>
+        </div>
+      </nav>
+      <a class="btn header-cta" href={withBase('/contact/')}>{header.button}</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1"><slot /></main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href={withBase('/')}><Icon name="bell" /><span class="brand-text"><span class="brand-name">{settings.siteName}</span><span class="brand-tag">{settings.siteTagline}</span></span></a>
+          {footer.text && <p style="margin-top:1rem;max-width:34ch">{footer.text}</p>}
+          <div class="socials">
+            {settings.facebook && <a href={settings.facebook} target="_blank" rel="noopener" aria-label="עפר מרבך בפייסבוק"><Icon name="fb" /></a>}
+            {settings.youtube && <a href={settings.youtube} target="_blank" rel="noopener" aria-label="הערוץ של עפר מרבך ביוטיוב"><Icon name="yt" /></a>}
+          </div>
+        </div>
+        <div>
+          <h2>{footer.pagesTitle}</h2>
+          <ul>{footerPages.map((m) => <li><a href={m.href}>{m.label}</a></li>)}</ul>
+        </div>
+        <div>
+          <h2>{footer.contactTitle}</h2>
+          <ul>
+            <li><a href={CONTACT.whatsapp()} target="_blank" rel="noopener">{footer.whatsapp}</a></li>
+            <li><a href={CONTACT.tel}>{CONTACT.phone}</a></li>
+            <li><a href={CONTACT.mailto}>{CONTACT.email}</a></li>
+            <li><a href={withBase('/contact/')}>{footer.form}</a></li>
+            {footer.recommend && <li><a href={withBase('/recommend/')}>{footer.recommend}</a></li>}
+            <li><a href={settings.courseUrl} target="_blank" rel="noopener">{footer.course}</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="fineprint">
+        <span>{footer.copyright}</span>
+        <a href={withBase('/accessibility/')}>{footer.accessibility}</a>
+      </div>
+    </div>
+  </footer>
+
+  <a class="fab-wa" href={CONTACT.whatsapp()} target="_blank" rel="noopener" aria-label="וואטסאפ לעפר מרבך"><Icon name="wa" /></a>
+
+  <script>
+    import '../scripts/site.ts';
+  </script>
+</body>
+</html>

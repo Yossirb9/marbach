@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { page, richHtml } from '../lib/data';
+const p = await page('accessibility');
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription}>
+  <PageHero title={p.title} />
+  <section class="section section-tight">
+    <div class="narrow prose" set:html={richHtml(p.body)} />
+  </section>
+</Base>

@@ -1,0 +1,169 @@
+---
+import Base from '../layouts/Base.astro';
+import BellScene from '../components/BellScene.astro';
+import Rings from '../components/Rings.astro';
+import Img from '../components/Img.astro';
+import YouTube from '../components/YouTube.astro';
+import Icon from '../components/Icon.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import ContactBand from '../components/ContactBand.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { page, settings, videos, articles, talks, AUDIENCE, img, withBase } from '../lib/data';
+
+const home = await page('home');
+const tedx = videos.find((v) => v.featured) ?? videos[0];
+const latest = articles.filter((a) => a.image).slice(0, 3);
+const cluster = img('/media/art/bells_cluster.png', '(max-width: 860px) 70vw, 40vw');
+const ripples = img('/media/art/ripples.png', '100vw');
+const iceberg = img('/media/art/iceberg.png', '(max-width: 860px) 80vw, 40vw');
+const orchid = img('/media/art/orchid.png', '(max-width: 860px) 50vw, 26vw');
+const { signals, about, tracks, tedx: tx, book, testimonials: ts, writing } = home;
+const ld = [{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'ד״ר עפר מרבך', url: new URL(withBase('/'), Astro.site!).href, inLanguage: 'he' }];
+---
+<Base title={home.seoTitle ?? home.title} description={home.seoDescription} jsonld={ld} bodyClass="home">
+  <!-- ======== hero: layered parallax ======== -->
+  <section class="hero" data-hero data-parallax>
+    <div class="hero-layer hero-ripples" data-depth="0.08" aria-hidden="true"><img src={ripples.src} srcset={ripples.srcset} sizes="100vw" alt="" decoding="async" /></div>
+    <Rings class="hero-rings" count={11} data-depth="0.18" />
+    <div class="hero-layer hero-cluster" data-depth="0.32" aria-hidden="true"><img src={cluster.src} srcset={cluster.srcset} sizes={cluster.sizes} width={cluster.width} height={cluster.height} alt="" decoding="async" /></div>
+    <figure class="hero-portrait" data-depth="-0.05">
+      <div class="arch"><Img src={home.heroImage} alt={home.heroImageAlt} sizes="(max-width: 860px) 62vw, 30vw" eager /></div>
+    </figure>
+    <div class="shell hero-copy" data-depth="0.12">
+      {home.kicker && <p class="kicker">{home.kicker}</p>}
+      <h1 class="display">{home.title}</h1>
+      <p class="hero-tag serif">{settings.siteTagline}.</p>
+      {home.intro && <p class="lead hero-lead">{home.intro}</p>}
+      <div class="btn-row">
+        {home.heroButton && <a class="btn btn-brass" href={withBase('/lectures/')}>{home.heroButton}</a>}
+        {home.heroButton2 && <a class="btn btn-ghost" href={withBase('/contact/')}>{home.heroButton2}</a>}
+      </div>
+      {home.quote && <p class="hero-quote serif">{home.quote}<span>{home.quoteBy}</span></p>}
+    </div>
+  </section>
+
+  <!-- ======== the signature scene ======== -->
+  <BellScene />
+
+  <!-- ======== three signals ======== -->
+  <section class="section section-paper2 clip signals" id="signals" data-parallax>
+    <div class="art signals-art" data-speed="0.25" aria-hidden="true"><img src={iceberg.src} srcset={iceberg.srcset} sizes={iceberg.sizes} width={iceberg.width} height={iceberg.height} alt="" loading="lazy" decoding="async" /></div>
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        {signals.kicker && <p class="kicker">{signals.kicker}</p>}
+        {signals.title && <h2 class="h2">{signals.title}</h2>}
+        {signals.lead && <p class="lead">{signals.lead}</p>}
+      </div>
+      <ol class="signals-list">
+        {signals.items.map((s, i) => (
+          <li class="signal" data-reveal style={`--d:${i * 0.1}s`}>
+            <span class="num">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.title}</h3>
+            {s.sub && <p class="signal-sub">{s.sub}</p>}
+            {s.text && <p>{s.text}</p>}
+          </li>
+        ))}
+      </ol>
+      <p style="margin-top:2rem"><a class="link-arrow" href={withBase('/video/')}>{signals.link}<Icon name="arrow" /></a></p>
+    </div>
+  </section>
+
+  <!-- ======== about teaser ======== -->
+  <section class="section clip about-teaser" data-parallax>
+    <Rings class="about-rings" count={8} data-speed="0.1" />
+    <div class="shell about-grid">
+      <div class="about-photo" data-reveal>
+        <div class="arch" data-speed="-0.06"><Img src={about.image} alt={about.imageAlt} sizes="(max-width: 860px) 80vw, 420px" /></div>
+      </div>
+      <div class="about-copy" data-reveal style="--d:.1s">
+        {about.kicker && <p class="kicker">{about.kicker}</p>}
+        {about.title && <h2 class="h2">{about.title}</h2>}
+        {about.lead && <p class="lead">{about.lead}</p>}
+        {about.stats.length > 0 && <ul class="stats">
+          {about.stats.map((st) => <li><strong>{st.value}</strong><span>{st.label}</span></li>)}
+        </ul>}
+        <a class="link-arrow" href={withBase('/about/')}>{about.link}<Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== tracks ======== -->
+  <section class="section section-tight tracks">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        {tracks.kicker && <p class="kicker">{tracks.kicker}</p>}
+        {tracks.title && <h2 class="h2">{tracks.title}</h2>}
+      </div>
+      <div class="grid grid-3">
+        {tracks.items.map((t, i) => {
+          const a = img(t.art, '120px');
+          const list = talks.filter((x) => x.audience === t.audience || (x.audience === 'all' && t.audience !== 'principals'));
+          return (
+            <a class="card card-link track" href={withBase(`/lectures/#${t.audience}`)} data-reveal style={`--d:${i * 0.08}s`}>
+              <span class="track-art" aria-hidden="true"><img src={a.at(360)} alt="" loading="lazy" decoding="async" /></span>
+              <h3>{t.title}</h3>
+              {t.text && <p>{t.text}</p>}
+              <ul class="track-list">{list.slice(0, 4).map((x) => <li>{x.title}</li>)}</ul>
+              <span class="link-arrow">{tracks.link}<Icon name="arrow" /></span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== TEDx ======== -->
+  <section class="section section-night clip tedx" data-parallax>
+    <div class="art tedx-cluster" data-speed="0.3" aria-hidden="true"><img src={cluster.at(1200)} alt="" loading="lazy" decoding="async" /></div>
+    <Rings class="tedx-rings" count={10} data-speed="0.12" />
+    <div class="shell tedx-grid">
+      <div class="tedx-copy" data-reveal>
+        {tx.kicker && <p class="kicker">{tx.kicker}</p>}
+        {tx.title && <h2 class="h2">{tx.title}</h2>}
+        {tx.lead && <p class="lead">{tx.lead}</p>}
+        <a class="btn btn-ghost" href={withBase('/video/')}>{tx.button}</a>
+      </div>
+      <div class="tedx-video" data-reveal style="--d:.12s"><YouTube video={tedx} meta={false} /></div>
+    </div>
+  </section>
+
+  <!-- ======== book & course ======== -->
+  <section class="section clip book-band" data-parallax>
+    <div class="art book-orchid" data-speed="0.22" aria-hidden="true"><img src={orchid.src} srcset={orchid.srcset} sizes={orchid.sizes} width={orchid.width} height={orchid.height} alt="" loading="lazy" decoding="async" /></div>
+    <div class="shell book-grid">
+      <div class="book-cover" data-reveal>
+        <div class="book-3d" data-speed="-0.08"><Img src={book.image} alt={book.imageAlt} sizes="(max-width: 860px) 60vw, 320px" /></div>
+      </div>
+      <div class="book-copy" data-reveal style="--d:.1s">
+        {book.kicker && <p class="kicker">{book.kicker}</p>}
+        {book.title && <h2 class="h2">{book.title}</h2>}
+        {book.lead && <p class="lead">{book.lead}</p>}
+        {book.text && <p>{book.text}</p>}
+        <div class="btn-row">
+          <a class="btn" href={withBase('/kolot-paamonim/')}>{book.button}</a>
+          <a class="btn btn-ghost" href={settings.courseUrl} target="_blank" rel="noopener">{book.button2}<Icon name="ext" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== writing ======== -->
+  <section class="section section-paper2 writing-teaser">
+    <div class="shell">
+      <div class="section-head writing-head" data-reveal>
+        {writing.kicker && <p class="kicker">{writing.kicker}</p>}
+        {writing.title && <h2 class="h2">{writing.title}</h2>}
+        {writing.lead && <p class="lead">{writing.lead}</p>}
+      </div>
+      <div class="grid grid-3">
+        {latest.map((a, i) => <div data-reveal style={`--d:${i * 0.08}s`}><ArticleCard article={a} /></div>)}
+      </div>
+      <p style="margin-top:2rem"><a class="link-arrow" href={withBase('/writing/')}>{writing.link}<Icon name="arrow" /></a></p>
+    </div>
+  </section>
+
+  <!-- ======== testimonials (CMS: המלצות) ======== -->
+  <Testimonials kicker={ts.kicker} title={ts.title} lead={ts.lead} videos={3} videosLink={ts.videosLink} writeLink={ts.writeLink} />
+
+  <ContactBand />
+</Base>

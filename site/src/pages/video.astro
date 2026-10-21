@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import YouTube from '../components/YouTube.astro';
+import Icon from '../components/Icon.astro';
+import Rings from '../components/Rings.astro';
+import ContactBand from '../components/ContactBand.astro';
+import { page, videos, testimonials, testimonialVideo, settings, heMonth } from '../lib/data';
+// texts: src/content/pages/video.json; the videos: src/content/videos (CMS: וידאו); participants: src/content/testimonials (CMS: המלצות)
+const p = await page('video');
+const tedx = videos.find((v) => v.kind === 'talk');
+const lectures = videos.filter((v) => v.kind === 'lecture');
+const voices = testimonials.filter((t) => t.youtube);
+const ld = [...videos.map((v) => ({ title: v.title, description: v.description, youtube: v.youtube, date: v.date })),
+  ...voices.map((t) => ({ title: t.name, description: t.quote || 'משתתפים בתכנית ״קולות פעמונים״', youtube: t.youtube!, date: undefined }))]
+  .map((v) => ({ '@context': 'https://schema.org', '@type': 'VideoObject', name: v.title, description: v.description || v.title,
+    thumbnailUrl: `https://i.ytimg.com/vi/${v.youtube}/hqdefault.jpg`, embedUrl: `https://www.youtube-nocookie.com/embed/${v.youtube}`,
+    ...(v.date ? { uploadDate: v.date } : {}) }));
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription} jsonld={ld}>
+  <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/art/lectern.png" />
+
+  {tedx && (
+    <section class="section section-night clip" data-parallax>
+      <Rings count={11} data-speed="0.12" style="width:1300px;left:-560px;top:50%;translate:0 -50%" />
+      <div class="shell tedx-grid">
+        <div data-reveal>
+          <p class="kicker">{[p.tedx.kicker, tedx.date && heMonth(tedx.date)].filter(Boolean).join(' · ')}</p>
+          {tedx.title && <h2 class="h2">{tedx.title}</h2>}
+          {tedx.description && <p class="lead">{tedx.description}</p>}
+          {tedx.duration && <p class="small" style="opacity:.75">{tedx.duration} {p.tedx.durationNote}</p>}
+        </div>
+        <div data-reveal style="--d:.1s"><YouTube video={tedx} meta={false} eager /></div>
+      </div>
+    </section>
+  )}
+
+  {lectures.length > 0 && (
+    <section class="section">
+      <div class="shell">
+        <div class="section-head" data-reveal>
+          {p.lectures.kicker && <p class="kicker">{p.lectures.kicker}</p>}
+          {p.lectures.title && <h2 class="h2">{p.lectures.title}</h2>}
+        </div>
+        <div class="grid grid-2">
+          {lectures.map((v, i) => <div data-reveal style={`--d:${i * 0.08}s`}><YouTube video={v} />{v.description && <p class="small muted" style="margin-top:.4rem">{v.description}</p>}</div>)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section section-paper2" id="voices">
+    <div class="shell">
+      <div class="section-head" data-reveal>
+        {p.voices.kicker && <p class="kicker">{p.voices.kicker}</p>}
+        {p.voices.title && <h2 class="h2">{p.voices.title}</h2>}
+      </div>
+      <div class="voices">
+        {voices.map((t, i) => <div data-reveal style={`--d:${(i % 3) * 0.06}s`}><YouTube video={testimonialVideo(t)} sizes="(max-width: 760px) 100vw, 380px" /></div>)}
+      </div>
+      {settings.youtube && p.voices.youtubeLink && <p style="margin-top:2rem"><a class="link-arrow" href={settings.youtube} target="_blank" rel="noopener">{p.voices.youtubeLink}<Icon name="arrow" /></a></p>}
+    </div>
+  </section>
+
+  {p.press.items.length > 0 && (
+    <section class="section section-tight">
+      <div class="shell two-col">
+        <div data-reveal>
+          {p.press.kicker && <p class="kicker">{p.press.kicker}</p>}
+          {p.press.title && <h2 class="h2">{p.press.title}</h2>}
+        </div>
+        <ul class="media-list" data-reveal style="--d:.1s">
+          {p.press.items.map((m) => <li><a href={m.url} target="_blank" rel="noopener"><strong>{m.title}</strong><span>{m.text}</span></a></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <ContactBand />
+</Base>

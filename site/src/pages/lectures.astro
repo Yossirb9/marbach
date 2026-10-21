@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactBand from '../components/ContactBand.astro';
+import Testimonials from '../components/Testimonials.astro';
+import { page, talks, img, withBase } from '../lib/data';
+// texts: src/content/pages/lectures.json (CMS: עמודי האתר → הרצאות וסדנאות); the talks themselves: src/content/talks
+const p = await page('lectures');
+// three tracks; a talk for "all" appears with the staff and with the parents
+const TRACKS = p.tracks.map((t) => ({ key: t.audience, title: t.title, lead: t.lead }));
+const of = (k: string) => talks.filter((t) => t.audience === k || (t.audience === 'all' && k === 'staff'));
+const ld = talks.map((t) => ({ '@context': 'https://schema.org', '@type': 'Service', name: t.title, description: t.summary, serviceType: 'הרצאה / סדנה',
+  provider: { '@id': new URL(withBase('/#person'), Astro.site!).href }, areaServed: 'IL', inLanguage: 'he' }));
+---
+<Base title={p.seoTitle ?? p.title} description={p.seoDescription} jsonld={ld}>
+  <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/art/lectern.png">
+    <nav class="anchor-nav" aria-label="מסלולים">
+      {TRACKS.map((t) => <a href={`#${t.key}`}>{t.title}</a>)}
+    </nav>
+  </PageHero>
+
+  {TRACKS.map((tr, ti) => (
+    <section class:list={['section', 'section-tight', ti % 2 === 1 && 'section-paper2']} id={tr.key} aria-labelledby={`h-${tr.key}`}>
+      <div class="shell">
+        <div class="track-head" data-reveal><h2 class="h2" id={`h-${tr.key}`}>{tr.title}</h2></div>
+        {tr.lead && <p class="lead" style="max-width:720px" data-reveal>{tr.lead}</p>}
+        <div>
+          {of(tr.key).map((t) => {
+            const a = t.art ? img(t.art, '220px') : null;
+            return (
+              <article class="talk" data-reveal>
+                <div>
+                  <h3 class="h3" style="font-size:clamp(1.5rem,1.2rem + 1.2vw,2.2rem);font-weight:500">{t.title}</h3>
+                  {t.format && <p class="talk-format">{t.format}</p>}
+                  {t.summary && <p>{t.summary}</p>}
+                  {t.topics.length > 0 && <ul>{t.topics.map((x) => <li>{x}</li>)}</ul>}
+                  {t.quote && <p class="talk-quote">{t.quote}</p>}
+                </div>
+                {a && <img class="talk-art" src={a.at(360)} alt="" loading="lazy" decoding="async" width="220" height={Math.round(220 / a.ratio)} />}
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <Testimonials kicker={p.testimonials.kicker} title={p.testimonials.title} writeLink={p.testimonials.writeLink} tone={TRACKS.length % 2 === 1 ? 'paper2' : 'paper'} />
+
+  <ContactBand title={p.contactTitle} text={p.contactText} />
+</Base>

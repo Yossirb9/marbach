@@ -1,0 +1,9 @@
+---
+// Decorative concentric arcs: the resonance of a bell. Pure SVG, aria-hidden, sized by the caller's class/style.
+interface Props { class?: string; count?: number; style?: string; [k: `data-${string}`]: unknown }
+const { class: cls = '', count = 9, style, ...rest } = Astro.props;
+const rs = Array.from({ length: count }, (_, i) => 30 + i * (470 / count));
+---
+<svg class={`rings ${cls}`} viewBox="0 0 1000 1000" aria-hidden="true" focusable="false" style={style} {...rest}>
+  {rs.map((r, i) => <circle cx="500" cy="500" r={r} style={`opacity:${(1 - i / (count + 2)).toFixed(2)}`} />)}
+</svg>
