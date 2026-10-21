@@ -525,6 +525,256 @@
   ],
   "full": "/m/4ccc4b6acb-1672.webp"
  },
+ "articles/after-the-holidays.jpg": {
+  "id": "adcb275686",
+  "w": 1536,
+  "h": 1024,
+  "sig": "a156edf27ed3",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/adcb275686-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/adcb275686-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/adcb275686-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/adcb275686-1536.webp"
+   }
+  ],
+  "full": "/m/adcb275686-1536.webp"
+ },
+ "articles/ceremonies.jpg": {
+  "id": "b3dfe7d80f",
+  "w": 1536,
+  "h": 1024,
+  "sig": "836653f83edf",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/b3dfe7d80f-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/b3dfe7d80f-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/b3dfe7d80f-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/b3dfe7d80f-1536.webp"
+   }
+  ],
+  "full": "/m/b3dfe7d80f-1536.webp"
+ },
+ "articles/challenging-minority.jpg": {
+  "id": "438c1b5025",
+  "w": 1536,
+  "h": 1024,
+  "sig": "89c4eadfa7dd",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/438c1b5025-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/438c1b5025-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/438c1b5025-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/438c1b5025-1536.webp"
+   }
+  ],
+  "full": "/m/438c1b5025-1536.webp"
+ },
+ "articles/failure.jpg": {
+  "id": "a40994b30d",
+  "w": 1536,
+  "h": 1024,
+  "sig": "1c20305fb5fd",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/a40994b30d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/a40994b30d-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/a40994b30d-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/a40994b30d-1536.webp"
+   }
+  ],
+  "full": "/m/a40994b30d-1536.webp"
+ },
+ "articles/regulation.jpg": {
+  "id": "686b7e416d",
+  "w": 1536,
+  "h": 1024,
+  "sig": "02276c312b2b",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/686b7e416d-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/686b7e416d-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/686b7e416d-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/686b7e416d-1536.webp"
+   }
+  ],
+  "full": "/m/686b7e416d-1536.webp"
+ },
+ "articles/relevance.jpg": {
+  "id": "61aa7b3b3e",
+  "w": 1536,
+  "h": 1024,
+  "sig": "f1dc9eb2a658",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/61aa7b3b3e-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/61aa7b3b3e-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/61aa7b3b3e-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/61aa7b3b3e-1536.webp"
+   }
+  ],
+  "full": "/m/61aa7b3b3e-1536.webp"
+ },
+ "articles/relevant-school.jpg": {
+  "id": "0ff141dcc5",
+  "w": 1536,
+  "h": 1024,
+  "sig": "3fa1f634ee08",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/0ff141dcc5-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/0ff141dcc5-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/0ff141dcc5-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/0ff141dcc5-1536.webp"
+   }
+  ],
+  "full": "/m/0ff141dcc5-1536.webp"
+ },
+ "articles/sorry.jpg": {
+  "id": "0c9d29d2c8",
+  "w": 1536,
+  "h": 1024,
+  "sig": "7b1cf1d0b208",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/0c9d29d2c8-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/0c9d29d2c8-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/0c9d29d2c8-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/0c9d29d2c8-1536.webp"
+   }
+  ],
+  "full": "/m/0c9d29d2c8-1536.webp"
+ },
+ "articles/testimonials.jpg": {
+  "id": "774ec2b455",
+  "w": 1536,
+  "h": 1024,
+  "sig": "c6f66adb0d2c",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/774ec2b455-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/774ec2b455-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/774ec2b455-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/774ec2b455-1536.webp"
+   }
+  ],
+  "full": "/m/774ec2b455-1536.webp"
+ },
+ "articles/ynet-cameras.jpg": {
+  "id": "b54cf89278",
+  "w": 1536,
+  "h": 1024,
+  "sig": "ea31ccaf2c2b",
+  "variants": [
+   {
+    "w": 360,
+    "src": "/m/b54cf89278-360.webp"
+   },
+   {
+    "w": 720,
+    "src": "/m/b54cf89278-720.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/m/b54cf89278-1200.webp"
+   },
+   {
+    "w": 1536,
+    "src": "/m/b54cf89278-1536.webp"
+   }
+  ],
+  "full": "/m/b54cf89278-1536.webp"
+ },
  "book/growing-the-orchids.jpg": {
   "id": "4772cf6cb6",
   "w": 1574,
