@@ -19,3 +19,9 @@ assets-src/
 .env.*
 *.env
 .secrets*
+
+# Cloudflare: local D1/R2 state, generated types
+.wrangler/
+site/.wrangler/
+site/worker-configuration.d.ts
+.dev.vars*

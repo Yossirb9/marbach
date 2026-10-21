@@ -1,28 +1,73 @@
 # האתר של ד"ר עפר מרבך
 
-Astro 7, GSAP + ScrollTrigger, Lenis. עברית RTL. התוכן ב-`site/src/content` (JSON), הניהול ב-Pages CMS (`.pages.yml`).
-**כל טקסט באתר נמצא בקובצי התוכן, לא בתבניות**: `pages/<עמוד>.json` (סכמה נפרדת לכל עמוד ב-`content.config.ts`), `layout.json` (תפריט, ראש העמוד, תחתית, הפס הכהה, 404), `settings.json` (פרטי קשר וקישורים), והאוספים `articles`, `testimonials`, `videos`, `talks`. מדריך לעפר: `docs/מדריך-ניהול-האתר.md`.
-**פריסה**: push ל-`main` (כולל כל שמירה ב-Pages CMS) → `.github/workflows/deploy.yml` בונה ומפרסם ל-GitHub Pages תוך כ-2 דקות. `public/m` + `src/data/images.json` הם מטמון שנשמר בגיט, כדי שהבנייה תמיר רק תמונות חדשות.
-פרויקט ברטר חיצוני: בלי לוגו של צליל ובלי אזכור של בית הספר. **noindex** עד אישור (`settings.json` → `noindex`).
+Astro 7 במצב שרת על **Cloudflare Workers**, עם GSAP + ScrollTrigger ו-Lenis. עברית RTL.
+
+**הכל בחשבון Cloudflare אחד, בלי שירות חיצוני:**
+- **D1:** התוכן, המשתמשים, ה-sessions ומטמון ה-HTML.
+- **R2:** התמונות.
+- **ממשק ניהול משלנו ב-‎`/admin`:** שם משתמש וסיסמה.
+
+**מסמכים:**
+- מדריך לעפר: `docs/מדריך-ניהול-האתר.md`.
+- פריסה, צעד אחר צעד (לסול): `docs/deploy-cloudflare.md`.
+
+פרויקט ברטר חיצוני: בלי לוגו של צליל ובלי אזכור של בית הספר. **noindex** עד אישור (בניהול: פרטי קשר והגדרות ← noindex).
+
+## איך זה עובד
+- **התוכן:**
+  - **טבלאות:** הטבלה `singletons` מחזיקה את תשעת העמודים, `settings` ו-`layout`. הטבלה `entries` מחזיקה את `articles`, `talks`, `videos` ו-`testimonials`. כל שורה היא JSON.
+  - **סכמה:** הצורה של כל מסמך מוגדרת ב-`site/src/lib/schema.ts` (zod).
+  - **שמירה:** כל שמירה מהניהול עוברת אימות מול הסכמה בשרת.
+  - **רינדור:** כל רינדור מפרסר את התוכן דרך אותה סכמה, עם אותן ברירות מחדל.
+- **התבניות:** בלי שינוי, חוץ ממקור הנתונים. כל עמוד ורכיב מקבל את הנתונים דרך `useData(Astro.locals)` (‏`site/src/lib/data.ts`).
+  - **הבדיקה:** הטקסט ה-HTML של כל עמוד זהה ל-build הסטטי של `main`, וצילומי המסך ב-390 וב-1440 זהים בפיקסלים.
+  - **סקריפטים וסגנונות:** כל האנימציות, ה-parallax וסצנת הפעמון לא השתנו: `html.js`, ה-blur על `::before`, `data-lenis-prevent`, `scene-pinned`.
+- **מהירות** (`site/src/middleware.ts`):
+  - **מטמון:** כל עמוד ציבורי נשמר מרונדר בטבלת `html_cache`, לפי גרסת התוכן ו-id של ה-build. הגשה מהמטמון עולה שאילתת D1 אחת.
+  - **ריקון:** כל שמירה מעלה את הגרסה ומרוקנת את המטמון, כך שהשינוי מופיע מיד.
+  - **דפדפנים:** מאמתים מחדש עם ETag, והתשובה היא 304.
+- **תמונות:**
+  - **הגשה:** `/m/<id>-<w>.webp` מוגשות מ-R2 עם `immutable` לשנה, וגם מה-edge cache של Cloudflare כשיש דומיין משלנו.
+  - **העלאה:** הדפדפן ממיר כל העלאה ל-WebP ברוחבים 360, 720, 1200 ו-1800. ספארי, שלא יודע לכתוב WebP, מקבל JPEG. הקובץ המקורי נשמר ב-`media/<path>`.
+  - **מחיקה:** אי אפשר למחוק תמונה שנמצאת בשימוש.
+- **אבטחה** (`site/src/lib/auth.ts`):
+  - **סיסמאות:** PBKDF2-SHA256 דרך WebCrypto.
+  - **עוגיה:** `__Host-` מסוג HttpOnly, Secure ו-SameSite=Lax.
+  - **CSRF:** טוקן לכל session, יחד עם בדיקת Origin.
+  - **הגבלת כניסות:** 5 כישלונות לשם משתמש ו-10 לכתובת IP ברבע שעה.
+  - **ניהול:** כל `/admin` ו-`/api/admin` דורשים session. בניהול יש CSP קשיח, `X-Robots-Tag: noindex` ו-`no-store`.
+  - **HTML במאמרים:** מנוקה בשמירה וגם ברינדור (`site/src/lib/sanitize.ts`).
+- **טופס "כתבו המלצה":**
+  - **שליחה:** נשאר וואטסאפ או mailto לעפר. ההמלצה נשמרת גם ב-`submissions` כ"ממתינה לאישור".
+  - **הגנה מספאם:** honeypot, זמן מינימלי בדף, 5 לשעה לכל IP, 100 ביום לכל האתר, ו-Origin.
+- **הטפסים בניהול:**
+  - **מקור:** הטפסים נבנים מ-`site/src/admin/formspec.json`, עם התוויות וההסברים בעברית. הקובץ נוצר מ-`.pages.yml` בעזרת `npm run formspec`.
+  - **עורך טקסט עשיר:** TipTap, ארוז מקומית.
+  - **גרירה:** SortableJS.
 
 ## פקודות (מתוך `site/`)
 ```bash
 npm install
-npm run build                    # build-images (media → WebP) + astro build → dist/
-node scripts/qa-shots.mjs        # צילומי 390/1440 לכל עמוד → ../qa/shots + תמונות שבורות, גלילה אופקית, קונסול, קישורים
-MOTION=1 node scripts/qa-shots.mjs   # אותן בדיקות עם האנימציות פעילות → ../qa/shots-motion
-node scripts/qa-scroll.mjs       # סצנת הפעמון: פריימים 0–100% ב-390, 412x640, 1440 → ../qa/scroll + בדיקות + תפריט נייד
-npm run assets                   # חד-פעמי: איורים מ-assets-src/generated → media/art (רקע הנייר הופך לשקוף), צילומים, כריכה
+npm run db:migrate:local && node scripts/seed.mjs --local      # מסד ו-R2 מקומיים (.wrangler/state)
+node scripts/create-user.mjs --local --username yossi --role admin   # מדפיס סיסמה פעם אחת
+npm run preview      # astro build + wrangler dev → http://localhost:8787  (/admin)
+npm run dev          # שרת הפיתוח של Astro (גם הוא ב-workerd, אותו D1/R2 מקומי)
+npm run deploy       # astro build && wrangler deploy   (רק אחרי ההגדרה ב-docs/deploy-cloudflare.md)
+npm run images       # media/ → media-cache/m (WebP) + media-cache/images.json: רק בשביל ה-seed
 ```
-**GitHub Pages בתת-תיקייה** (ב-Git Bash חובה `MSYS_NO_PATHCONV=1`):
-```bash
-MSYS_NO_PATHCONV=1 BASE_PATH=/marbach/ SITE_URL=https://yossirb9.github.io npm run build
-```
-כל כתובת פנימית עוברת דרך `withBase()` ב-`src/lib/data.ts`.
+`src/content/*` הם **מקור ה-seed בלבד**. אחרי ה-seed, התוכן החי נמצא ב-D1, ועורכים אותו ב-`/admin`.
 
 ## מבנה
-- עמודים: בית, הרצאות וסדנאות (3 מסלולים: צוותים / הורים / מנהלים), קולות פעמונים (ספר, קורס, מועדון), וידאו ותקשורת, מאמרים ומחשבות (+ עמוד לכל מאמר), אודות, יצירת קשר (mailto), כתבו המלצה (וואטסאפ / mailto לעפר, בלי שרת), נגישות, 404.
-- המלצות (`testimonials`): ציטוטים → דף הבית, הרצאות, קולות פעמונים; סרטונים → עמוד הווידאו (ושלושה בדף הבית). `hidden` מסתיר. מאמר עם `draft` לא נבנה.
-- סצנת החתימה: `components/BellScene.astro` + `scripts/bell.ts`. מצב הסיום ב-CSS, מצב ההתחלה תחת `html.js` (נקבע ב-`<head>` לפני הציור הראשון).
-- לקחים משחר: ה-blur של ה-header על `::before`; ה-nav בנייד עם `data-lenis-prevent` וגובה `calc(100dvh - header)`; נבדק ב-412x640.
-- מקורות: `facts.md` (כל עובדה + קישור), `content_inventory.md` (מה נאסף ומאיפה), החומר הגולמי ב-`scrape/`.
+- **עמודים:**
+  - בית; הרצאות וסדנאות, עם 3 מסלולים: צוותים, הורים ומנהלים; קולות פעמונים: ספר, קורס ומועדון.
+  - וידאו ותקשורת; מאמרים ומחשבות, עם עמוד לכל מאמר; אודות.
+  - יצירת קשר (mailto), כתבו המלצה, נגישות, 404.
+- **ניהול:**
+  - `src/pages/admin/*`: המסכים.
+  - `src/pages/api/admin/*`: ה-API.
+  - `src/admin/*`: הקוד בדפדפן ו-CSS.
+  - `src/layouts/Admin.astro`.
+- **מקורות:**
+  - `facts.md`: כל עובדה, עם קישור.
+  - `content_inventory.md`: מה נאסף ומאיפה.
+  - `scrape/`: החומר הגולמי.

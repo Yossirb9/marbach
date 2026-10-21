@@ -1,0 +1,71 @@
+---
+// The admin's frame: Hebrew, right to left, a side menu on a computer and a drawer on a phone. Never indexed
+// (meta here + X-Robots-Tag from the middleware). The CSRF token of the session is in <meta name="csrf-token">.
+import '@fontsource-variable/assistant/wght.css';
+import '../admin/admin.css';
+import { env } from 'cloudflare:workers';
+import { withBase } from '../lib/data';
+
+interface Props { title: string; screen: string; active?: string; wide?: boolean }
+const { title, screen, active, wide } = Astro.props;
+const user = Astro.locals.user;
+let pending = 0;
+if (user) {
+  const r = await env.DB.prepare(`SELECT COUNT(*) AS n FROM submissions WHERE status = 'pending'`).first<{ n: number }>();
+  pending = r?.n ?? 0;
+}
+const NAV = [
+  { key: 'home', href: '/admin/', label: 'לוח הבקרה' },
+  { key: 'pages', href: '/admin/pages/', label: 'עמודי האתר' },
+  { key: 'articles', href: '/admin/list/articles/', label: 'מאמרים' },
+  { key: 'talks', href: '/admin/list/talks/', label: 'הרצאות וסדנאות' },
+  { key: 'videos', href: '/admin/list/videos/', label: 'סרטונים' },
+  { key: 'testimonials', href: '/admin/list/testimonials/', label: 'המלצות' },
+  { key: 'inbox', href: '/admin/inbox/', label: 'ממתינות לאישור', badge: pending },
+  { key: 'layout', href: '/admin/edit/layout/', label: 'תפריט, כותרת ותחתית' },
+  { key: 'settings', href: '/admin/edit/settings/', label: 'פרטי קשר והגדרות' },
+  { key: 'media', href: '/admin/media/', label: 'תמונות' },
+  ...(user?.role === 'admin' ? [{ key: 'users', href: '/admin/users/', label: 'משתמשים' }] : []),
+  { key: 'account', href: '/admin/account/', label: 'החשבון שלי' },
+];
+---
+<!doctype html>
+<html lang="he" dir="rtl" data-base={withBase('/')}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="same-origin" />
+  {user && <meta name="csrf-token" content={user.csrf} />}
+  <meta name="theme-color" content="#1b2a2c" />
+  <title>{title} · ניהול האתר</title>
+  <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+</head>
+<body data-screen={screen} class:list={[!user && 'no-user']}>
+  {user ? (
+    <>
+      <header class="topbar">
+        <button class="menu-toggle" type="button" data-menu-toggle aria-label="תפריט"><span></span><span></span><span></span></button>
+        <a class="topbar-brand" href={withBase('/admin/')}>ניהול האתר <span>ד״ר עפר מרבך</span></a>
+        <a class="topbar-site" href={withBase('/')} target="_blank" rel="noopener">לאתר ↗</a>
+      </header>
+      <nav class="sidenav" aria-label="ניהול">
+        <ul>
+          {NAV.map((n) => (
+            <li><a href={withBase(n.href)} aria-current={active === n.key ? 'page' : undefined}>{n.label}{n.badge ? <span class="badge badge-count">{n.badge}</span> : null}</a></li>
+          ))}
+        </ul>
+        <div class="sidenav-foot">
+          <span class="muted">{user.display_name || user.username}</span>
+          <button type="button" class="btn btn-small btn-ghost" data-logout>יציאה</button>
+        </div>
+      </nav>
+      <div class="nav-scrim" data-menu-toggle></div>
+    </>
+  ) : null}
+  <main class:list={['main', wide && 'main-wide']} id="main">
+    <slot />
+  </main>
+  <script>import '../admin/screens.ts';</script>
+</body>
+</html>

@@ -5,16 +5,17 @@ import Img from '../components/Img.astro';
 import Icon from '../components/Icon.astro';
 import Rings from '../components/Rings.astro';
 import ContactBand from '../components/ContactBand.astro';
-import { page, settings, testimonials, bareQuote, img, withBase } from '../lib/data';
+import { useData, bareQuote, withBase, siteOrigin } from '../lib/data';
+const { page, settings, testimonials, img } = useData(Astro.locals);
 // every text on this page: src/content/pages/book.json (CMS: עמודי האתר → קולות פעמונים)
 const p = await page('book');
 const { book, sentences, course, club } = p;
 // testimonials with a quote (CMS: המלצות); the link to the participants' videos goes on the last one
 const quotes = testimonials.filter((t) => t.quote);
 const bells = img('/media/art/bells_cluster.png', '(max-width: 760px) 90vw, 600px');
-const ld = [{ '@context': 'https://schema.org', '@type': 'Book', name: 'קולות פעמונים: כלים להתמודדות עם אתגרים בחינוך', author: { '@id': new URL(withBase('/#person'), Astro.site!).href }, inLanguage: 'he', datePublished: '2020', publisher: 'סטימצקי' },
-  { '@context': 'https://schema.org', '@type': 'Book', name: 'Growing the Orchids: The Innovative Educational Method to Help Kids Blossom', author: { '@id': new URL(withBase('/#person'), Astro.site!).href }, inLanguage: 'en', datePublished: '2021-02-09', numberOfPages: 146, url: settings.bookUrlEn },
-  { '@context': 'https://schema.org', '@type': 'Course', name: 'קולות פעמונים: התכנית הדיגיטלית', description: 'קורס דיגיטלי למורות ולמורים: ילדים מאתגרים, ניהול כיתה והתנהלות מול הורים.', url: settings.courseUrl, inLanguage: 'he', provider: { '@id': new URL(withBase('/#person'), Astro.site!).href } }];
+const ld = [{ '@context': 'https://schema.org', '@type': 'Book', name: 'קולות פעמונים: כלים להתמודדות עם אתגרים בחינוך', author: { '@id': new URL(withBase('/#person'), siteOrigin(Astro)).href }, inLanguage: 'he', datePublished: '2020', publisher: 'סטימצקי' },
+  { '@context': 'https://schema.org', '@type': 'Book', name: 'Growing the Orchids: The Innovative Educational Method to Help Kids Blossom', author: { '@id': new URL(withBase('/#person'), siteOrigin(Astro)).href }, inLanguage: 'en', datePublished: '2021-02-09', numberOfPages: 146, url: settings.bookUrlEn },
+  { '@context': 'https://schema.org', '@type': 'Course', name: 'קולות פעמונים: התכנית הדיגיטלית', description: 'קורס דיגיטלי למורות ולמורים: ילדים מאתגרים, ניהול כיתה והתנהלות מול הורים.', url: settings.courseUrl, inLanguage: 'he', provider: { '@id': new URL(withBase('/#person'), siteOrigin(Astro)).href } }];
 ---
 <Base title={p.seoTitle ?? p.title} description={p.seoDescription} jsonld={ld}>
   <PageHero kicker={p.kicker} title={p.title} intro={p.intro}>

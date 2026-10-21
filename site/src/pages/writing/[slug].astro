@@ -4,18 +4,17 @@ import Img from '../../components/Img.astro';
 import Icon from '../../components/Icon.astro';
 import Rings from '../../components/Rings.astro';
 import ContactBand from '../../components/ContactBand.astro';
-import { articles, heDate, articleUrl, withBase, page, settings, richHtml } from '../../lib/data';
+import { useData, heDate, articleUrl, withBase, siteOrigin } from '../../lib/data';
+const { articles, page, settings, richHtml } = useData(Astro.locals);
 
-export function getStaticPaths() {
-  // articles is a top-level await in lib/data; Astro resolves it before calling getStaticPaths
-  return articles.map((a, i) => ({ params: { slug: a.slug }, props: { i } }));
-}
-const { i } = Astro.props as { i: number };
+// rendered on request: the article with this slug (drafts only in the admin's preview), otherwise the 404 page
+const i = articles.findIndex((x) => x.slug === Astro.params.slug);
+if (i < 0) return Astro.rewrite('/404/');
 const w = await page('writing');
 const a = articles[i];
 const newer = articles[i - 1], older = articles[i + 1];
 const ld = [{ '@context': 'https://schema.org', '@type': 'Article', headline: a.title, datePublished: a.date, inLanguage: 'he',
-  author: { '@id': new URL(withBase('/#person'), Astro.site!).href }, isBasedOn: a.sourceUrl }];
+  author: { '@id': new URL(withBase('/#person'), siteOrigin(Astro)).href }, isBasedOn: a.sourceUrl }];
 ---
 <Base title={`${a.title} | ${settings.siteName}`} description={a.excerpt} image={a.image ?? '/media/art/og-plate.jpg'} jsonld={ld}>
   <section class="page-hero article-head">

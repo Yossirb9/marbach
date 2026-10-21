@@ -1,8 +1,9 @@
-// The media library: every original image under site/media/ (the folder Pages CMS uploads into) becomes responsive
-// WebP variants in public/m/, and src/data/images.json maps it:
+// The original media library: every image under site/media/ becomes responsive WebP variants in media-cache/m/, and
+// media-cache/images.json maps it:
 //   { "<path under media/>": { id, w, h, variants: [{w, src}], full } }
-// Runs before every build (npm run build). public/m + images.json are committed as a cache, so a build only
-// converts images that are new; variants of images no longer in media/ are removed.
+// Only the seed uses this (scripts/seed.mjs uploads media/ + media-cache/m to R2 and the map to D1). On the live site,
+// images are uploaded in the admin, which makes the same variants in the browser. media-cache is committed, so a run
+// only converts images that are new; variants of images no longer in media/ are removed.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -10,8 +11,8 @@ import sharp from 'sharp';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const MEDIA = path.join(ROOT, 'media');
-const OUT = path.join(ROOT, 'public/m');
-const MANIFEST = path.join(ROOT, 'src/data/images.json');
+const OUT = path.join(ROOT, 'media-cache/m');
+const MANIFEST = path.join(ROOT, 'media-cache/images.json');
 const WIDTHS = [360, 720, 1200, 1800];
 
 fs.mkdirSync(OUT, { recursive: true });
@@ -31,7 +32,7 @@ for (const file of files) {
   const prev = old[rel];
   // same name but a different file (replaced in place) → convert again
   const sig = crypto.createHash("sha1").update(fs.readFileSync(file)).digest("hex").slice(0, 12);
-  if (prev && prev.sig === sig && prev.variants.every((v) => fs.existsSync(path.join(ROOT, 'public', v.src)))) {
+  if (prev && prev.sig === sig && prev.variants.every((v) => fs.existsSync(path.join(ROOT, 'media-cache', v.src)))) {
     manifest[rel] = prev; skipped++; continue;
   }
   try {

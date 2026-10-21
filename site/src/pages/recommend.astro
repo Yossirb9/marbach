@@ -1,10 +1,12 @@
 ---
-// "כתבו המלצה": a visitor writes a recommendation; it is sent to Ofer on WhatsApp (or by mail) already written.
-// Nothing is stored on the site and no form service is involved. Ofer publishes it himself in the CMS (המלצות).
+// "כתבו המלצה": a visitor writes a recommendation; it is sent to Ofer on WhatsApp (or by mail) already written, and
+// also stored on the site (/api/recommend/) as waiting for approval: Ofer approves it in /admin → "ממתינות לאישור".
+// No outside form service is involved.
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
-import { page, settings, CONTACT } from '../lib/data';
+import { useData, withBase } from '../lib/data';
+const { page, settings, CONTACT } = useData(Astro.locals);
 // every text on this page: src/content/pages/recommend.json (CMS: עמודי האתר → כתבו המלצה)
 const p = await page('recommend');
 const f = p.form;
@@ -13,7 +15,8 @@ const f = p.form;
   <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/articles/testimonials.jpg" />
   <section class="section">
     <div class="shell recommend-grid">
-      <form class="form card" data-recommend data-wa={CONTACT.waBase} data-email={settings.email} data-intro={f.messageIntro} data-subject={f.mailSubject} novalidate>
+      <form class="form card" data-recommend data-wa={CONTACT.waBase} data-email={settings.email} data-intro={f.messageIntro} data-subject={f.mailSubject} data-api={withBase('/api/recommend/')} novalidate>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
         <div class="field"><label for="r-name">{f.name}</label><input id="r-name" name="name" data-label={f.name} required autocomplete="name" /></div>
         <div class="field"><label for="r-role">{f.role}</label><input id="r-role" name="role" data-label={f.role} placeholder={f.rolePlaceholder} /></div>
         <div class="field"><label for="r-text">{f.text}</label><textarea id="r-text" name="text" data-label={f.text} required></textarea></div>

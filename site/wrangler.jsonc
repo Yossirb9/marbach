@@ -1,0 +1,28 @@
+// Cloudflare Workers: the whole site (public pages + /admin) is one Worker with a D1 database and an R2 bucket.
+// The ids below are placeholders: `npx wrangler d1 create marbach` prints the real database_id; paste it here before
+// the first remote migration (see docs/deploy-cloudflare.md). Local development (`npm run dev`, `npm run preview`)
+// works with these placeholders: wrangler keeps a local D1 + R2 under .wrangler/state.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "marbach-site",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "binding": "ASSETS", "directory": "./dist/client" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "marbach",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "marbach-media" }],
+  "vars": {
+    // the public address of the site (canonical links, sharing previews). Empty = the address the page was requested on.
+    "SITE_URL": "",
+    // PBKDF2 iterations for new passwords (Workers allows at most 100000; each hash keeps its own count)
+    "PBKDF2_ITERATIONS": "100000"
+  },
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,23 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { LOGIN_CSRF_COOKIE, randomToken } from '../../lib/auth';
+import { withBase } from '../../lib/data';
+if (Astro.locals.user) return Astro.redirect(withBase('/admin/'), 303);
+// one-time token for the login form (double submit: this cookie + the hidden field)
+const csrf = randomToken(24);
+Astro.cookies.set(LOGIN_CSRF_COOKIE, csrf, { path: '/', httpOnly: true, secure: true, sameSite: 'strict', maxAge: 3600 });
+---
+<Admin title="כניסה" screen="login">
+  <div class="login">
+    <h1>ניהול האתר</h1>
+    <p class="muted">ד״ר עפר מרבך</p>
+    <form id="login" class="card" autocomplete="on">
+      <input type="hidden" name="csrf" value={csrf} />
+      <label class="field"><span class="label">שם משתמש</span><input class="input" name="username" autocomplete="username" dir="ltr" required autofocus autocapitalize="none" spellcheck="false" /></label>
+      <label class="field"><span class="label">סיסמה</span><input class="input" name="password" type="password" autocomplete="current-password" dir="ltr" required /></label>
+      <p id="login-error" class="err" role="alert"></p>
+      <button class="btn btn-primary btn-block" type="submit">כניסה</button>
+      <p class="help">שכחתם את הסיסמה? מבקשים מיוסי לאפס אותה (בממשק, "משתמשים").</p>
+    </form>
+  </div>
+</Admin>

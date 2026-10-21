@@ -4,7 +4,8 @@
 // to show. Used on the home page and on the lectures page.
 import Icon from './Icon.astro';
 import YouTube from './YouTube.astro';
-import { testimonials, testimonialVideo, bareQuote, withBase } from '../lib/data';
+import { useData, bareQuote, withBase } from '../lib/data';
+const { testimonials, testimonialVideo } = useData(Astro.locals);
 interface Props { kicker?: string; title?: string; lead?: string; videos?: number; videosLink?: string; writeLink?: string; tone?: 'paper' | 'paper2' }
 const { kicker, title, lead, videos = 0, videosLink, writeLink, tone = 'paper' } = Astro.props;
 const quotes = testimonials.filter((t) => t.quote);

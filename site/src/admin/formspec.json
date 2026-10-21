@@ -1,0 +1,2215 @@
+{
+ "collections": {
+  "articles": {
+   "label": "מאמרים ומחשבות",
+   "description": "כל מאמר מקבל עמוד משלו, ומופיע בעמוד 'מאמרים ומחשבות' (החדש ראשון). שלושת האחרונים שיש להם תמונה מופיעים גם בדף הבית.",
+   "view": {
+    "primary": "title",
+    "fields": [
+     "title",
+     "date",
+     "draft"
+    ],
+    "sort": [
+     "date",
+     "title"
+    ],
+    "default": {
+     "sort": "date",
+     "order": "desc"
+    }
+   },
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "slug",
+     "label": "כתובת העמוד (באנגלית)",
+     "description": "מילה או שתיים באנגלית, באותיות קטנות ועם מקפים במקום רווחים. למשל: back-to-school. הכתובת תהיה /writing/back-to-school/",
+     "type": "string",
+     "required": true,
+     "pattern": {
+      "regex": "^[a-z0-9-]+$",
+      "message": "רק אותיות באנגלית קטנות, מספרים ומקפים"
+     }
+    },
+    {
+     "name": "date",
+     "label": "תאריך",
+     "type": "date",
+     "required": true
+    },
+    {
+     "name": "draft",
+     "label": "טיוטה (לא מוצג באתר)",
+     "description": "מסמנים כדי לשמור בלי לפרסם. מורידים את הסימון כשהמאמר מוכן.",
+     "type": "boolean",
+     "default": false
+    },
+    {
+     "name": "excerpt",
+     "label": "תקציר לכרטיס",
+     "description": "2-3 שורות שמופיעות בכרטיס של המאמר ובשיתוף בוואטסאפ",
+     "type": "text"
+    },
+    {
+     "name": "body",
+     "label": "הטקסט",
+     "description": "כותבים או מדביקים את המאמר. אפשר להדגיש, להוסיף קישורים, כותרות ותמונות. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "html"
+    },
+    {
+     "name": "image",
+     "label": "תמונה ראשית",
+     "description": "מופיעה בראש המאמר ובכרטיס שלו. לא חובה.",
+     "type": "image"
+    },
+    {
+     "name": "imageAlt",
+     "label": "תיאור התמונה (לעיוורים)",
+     "description": "ריק = תמונה דקורטיבית בלבד",
+     "type": "string"
+    },
+    {
+     "name": "sourceUrl",
+     "label": "קישור למקור (לא חובה)",
+     "description": "אם המאמר פורסם קודם במקום אחר (למשל פוסט בפייסבוק), הקישור אליו",
+     "type": "string",
+     "pattern": {
+      "regex": "^(https?://\\S+)?$",
+      "message": "קישור מלא, שמתחיל ב-https://"
+     }
+    },
+    {
+     "name": "sourceLabel",
+     "label": "שם המקור",
+     "description": "למשל: פייסבוק: ד\"ר עפר מרבך",
+     "type": "string"
+    },
+    {
+     "name": "dateApprox",
+     "label": "התאריך משוער",
+     "description": "מוסיף '(בקירוב)' ליד התאריך",
+     "type": "boolean"
+    },
+    {
+     "name": "truncated",
+     "label": "הטקסט מקוצר",
+     "description": "לשימוש פנימי: מסמנים אם השמטנו חלק מהמקור",
+     "type": "boolean"
+    }
+   ]
+  },
+  "testimonials": {
+   "label": "המלצות",
+   "description": "ציטוט, סרטון, או שניהם. ציטוטים מופיעים בדף הבית, בעמוד ההרצאות ובעמוד 'קולות פעמונים'; סרטונים בדף הבית (שלושת הראשונים) ובעמוד הווידאו. המלצות שמגיעות מהטופס 'כתבו המלצה' מעתיקים לכאן אחרי שעפר מאשר.",
+   "view": {
+    "primary": "name",
+    "fields": [
+     "name",
+     "role",
+     "order",
+     "hidden"
+    ],
+    "sort": [
+     "order",
+     "name"
+    ],
+    "default": {
+     "sort": "order",
+     "order": "asc"
+    }
+   },
+   "fields": [
+    {
+     "name": "name",
+     "label": "שם",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "role",
+     "label": "תפקיד / קשר לעפר",
+     "description": "שורה אחת מתחת לשם. למשל: מורה בבית הספר ״אדם וסביבה״",
+     "type": "string"
+    },
+    {
+     "name": "quote",
+     "label": "ההמלצה (ציטוט)",
+     "description": "הטקסט עצמו, בלי מירכאות (האתר מוסיף אותן). אפשר להשאיר ריק אם יש רק סרטון.",
+     "type": "text"
+    },
+    {
+     "name": "youtube",
+     "label": "סרטון ביוטיוב (לא חובה)",
+     "description": "מדביקים את הקישור לסרטון מיוטיוב (למשל https://www.youtube.com/watch?v=WEhm9eCATts), או רק את 11 התווים שאחרי v=. בטלפון: 'שיתוף' ← 'העתקת הקישור'.",
+     "type": "string",
+     "pattern": {
+      "regex": "^([\\w-]{11}|https?://(www\\.|m\\.)?(youtube\\.com|youtu\\.be)/\\S+)?$",
+      "message": "קישור מיוטיוב, או 11 התווים שאחרי v= בקישור"
+     }
+    },
+    {
+     "name": "poster",
+     "label": "תמונה לסרטון (לא חובה)",
+     "description": "ריק = התמונה של יוטיוב",
+     "type": "image"
+    },
+    {
+     "name": "order",
+     "label": "סדר",
+     "description": "מספר קטן = מופיע קודם",
+     "type": "number"
+    },
+    {
+     "name": "hidden",
+     "label": "להסתיר מהאתר",
+     "description": "מסמנים כדי להוריד מהאתר בלי למחוק",
+     "type": "boolean",
+     "default": false
+    }
+   ]
+  },
+  "videos": {
+   "label": "וידאו",
+   "description": "ההרצאות בעמוד הווידאו. סרטונים של משתתפים מספרים מוסיפים ב'המלצות'.",
+   "view": {
+    "primary": "title",
+    "fields": [
+     "poster",
+     "title",
+     "kind",
+     "order"
+    ],
+    "sort": [
+     "order",
+     "title"
+    ],
+    "default": {
+     "sort": "order",
+     "order": "asc"
+    }
+   },
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "youtube",
+     "label": "סרטון ביוטיוב",
+     "description": "מדביקים את הקישור לסרטון מיוטיוב (למשל https://www.youtube.com/watch?v=WEhm9eCATts), או רק את 11 התווים שאחרי v=. בטלפון: 'שיתוף' ← 'העתקת הקישור'.",
+     "type": "string",
+     "required": true,
+     "pattern": {
+      "regex": "^([\\w-]{11}|https?://(www\\.|m\\.)?(youtube\\.com|youtu\\.be)/\\S+)$",
+      "message": "קישור מיוטיוב, או 11 התווים שאחרי v= בקישור"
+     }
+    },
+    {
+     "name": "kind",
+     "label": "איפה מופיע",
+     "type": "select",
+     "required": true,
+     "default": "lecture",
+     "options": {
+      "values": [
+       {
+        "value": "talk",
+        "label": "הסרטון הראשי בראש עמוד הווידאו (הרצאת ה-TEDx)"
+       },
+       {
+        "value": "lecture",
+        "label": "הרצאות ומפגשים"
+       }
+      ]
+     }
+    },
+    {
+     "name": "order",
+     "label": "סדר",
+     "description": "מספר קטן = מופיע קודם",
+     "type": "number"
+    },
+    {
+     "name": "featured",
+     "label": "מוצג בדף הבית",
+     "description": "הסרטון שמופיע בדף הבית (מסמנים רק אחד)",
+     "type": "boolean"
+    },
+    {
+     "name": "poster",
+     "label": "תמונה ממוזערת (לא חובה)",
+     "description": "ריק = התמונה של יוטיוב",
+     "type": "image"
+    },
+    {
+     "name": "date",
+     "label": "תאריך",
+     "type": "date",
+     "default": ""
+    },
+    {
+     "name": "duration",
+     "label": "אורך",
+     "description": "למשל 9:56",
+     "type": "string"
+    },
+    {
+     "name": "channel",
+     "label": "ערוץ / מקום",
+     "description": "מופיע מתחת לכותרת, למשל: הערוץ של עפר",
+     "type": "string"
+    },
+    {
+     "name": "description",
+     "label": "תיאור קצר",
+     "type": "text"
+    }
+   ]
+  },
+  "talks": {
+   "label": "הרצאות וסדנאות",
+   "description": "כל הרצאה או שירות מופיעים בעמוד \"הרצאות וסדנאות\", במסלול של הקהל שלהם (וארבע הראשונות גם בכרטיס של המסלול בדף הבית).",
+   "view": {
+    "primary": "title",
+    "fields": [
+     "title",
+     "audience",
+     "order"
+    ],
+    "sort": [
+     "order",
+     "title"
+    ],
+    "default": {
+     "sort": "order",
+     "order": "asc"
+    }
+   },
+   "fields": [
+    {
+     "name": "title",
+     "label": "שם ההרצאה",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "audience",
+     "label": "קהל",
+     "type": "select",
+     "required": true,
+     "options": {
+      "values": [
+       {
+        "value": "staff",
+        "label": "צוותי חינוך"
+       },
+       {
+        "value": "parents",
+        "label": "הורים"
+       },
+       {
+        "value": "principals",
+        "label": "מנהלים ומסגרות"
+       },
+       {
+        "value": "all",
+        "label": "מחנכים והורים (מופיע אצל צוותי החינוך)"
+       }
+      ]
+     }
+    },
+    {
+     "name": "order",
+     "label": "סדר",
+     "description": "מספר קטן = מופיע קודם",
+     "type": "number"
+    },
+    {
+     "name": "summary",
+     "label": "תיאור",
+     "type": "text"
+    },
+    {
+     "name": "topics",
+     "label": "נושאים / שאלות",
+     "description": "שורה לכל נושא. אפשר להוסיף, למחוק ולגרור.",
+     "type": "string",
+     "list": true
+    },
+    {
+     "name": "format",
+     "label": "מתכונת",
+     "description": "למשל: הרצאה, או סדנה של כמה שעות",
+     "type": "string"
+    },
+    {
+     "name": "quote",
+     "label": "ציטוט",
+     "description": "רק ציטוט אמיתי מתוך מקור",
+     "type": "string"
+    },
+    {
+     "name": "quoteSource",
+     "label": "של מי הציטוט",
+     "type": "string"
+    },
+    {
+     "name": "art",
+     "label": "איור",
+     "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+     "type": "image"
+    },
+    {
+     "name": "sources",
+     "label": "מקורות (לא מוצג באתר)",
+     "type": "object",
+     "list": {
+      "summary": "{fields.label}"
+     },
+     "fields": [
+      {
+       "name": "label",
+       "label": "שם המקור",
+       "type": "string",
+       "required": true
+      },
+      {
+       "name": "url",
+       "label": "קישור",
+       "type": "string",
+       "required": true,
+       "pattern": {
+        "regex": "^https?://",
+        "message": "קישור מלא, שמתחיל ב-https://"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "singletons": {
+  "home": {
+   "label": "דף הבית",
+   "description": "כל הטקסטים של דף הבית, לפי הסדר שבו הם מופיעים. ההמלצות, ההרצאות, הסרטון והמאמרים נמשכים אוטומטית מהאזורים שלהם.",
+   "fields": [
+    {
+     "name": "title",
+     "label": "השם הגדול בראש העמוד",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל השם",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "heroImage",
+     "label": "התמונה בפתיחה",
+     "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+     "type": "image"
+    },
+    {
+     "name": "heroImageAlt",
+     "label": "תיאור התמונה (לעיוורים)",
+     "description": "משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.",
+     "type": "string"
+    },
+    {
+     "name": "heroButton",
+     "label": "כפתור ראשון (להרצאות)",
+     "type": "string"
+    },
+    {
+     "name": "heroButton2",
+     "label": "כפתור שני (ליצירת קשר)",
+     "type": "string"
+    },
+    {
+     "name": "quote",
+     "label": "הציטוט מתחת לכפתורים",
+     "type": "string"
+    },
+    {
+     "name": "quoteBy",
+     "label": "של מי הציטוט",
+     "type": "string"
+    },
+    {
+     "name": "bell",
+     "label": "סצנת הפעמון (נגלל)",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "intro",
+       "label": "משפט הפתיחה",
+       "type": "text"
+      },
+      {
+       "name": "lines",
+       "label": "שלוש השורות (חלש, חזק, חזק מאוד)",
+       "description": "בדיוק שלוש שורות: כל צלצול של הפעמון כותב שורה אחת",
+       "type": "string",
+       "list": {
+        "min": 3,
+        "max": 3
+       }
+      },
+      {
+       "name": "title",
+       "label": "הכותרת שהאותיות שלה מתאספות",
+       "description": "קצר: שתיים-שלוש מילים",
+       "type": "string"
+      },
+      {
+       "name": "sub",
+       "label": "המשפט שמתחת לכותרת",
+       "type": "text"
+      },
+      {
+       "name": "button",
+       "label": "הכפתור (לעמוד הווידאו)",
+       "type": "string"
+      },
+      {
+       "name": "link",
+       "label": "הקישור (לשלושת האיתותים)",
+       "type": "string"
+      },
+      {
+       "name": "hint",
+       "label": "הרמז לגלול",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "signals",
+     "label": "שלושת האיתותים",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה",
+       "type": "text"
+      },
+      {
+       "name": "items",
+       "label": "האיתותים",
+       "description": "המספרים (01, 02, 03) נוספים לבד לפי הסדר",
+       "type": "object",
+       "list": {
+        "summary": "{fields.title}"
+       },
+       "fields": [
+        {
+         "name": "title",
+         "label": "שם",
+         "type": "string"
+        },
+        {
+         "name": "sub",
+         "label": "שורת משנה",
+         "type": "string"
+        },
+        {
+         "name": "text",
+         "label": "הסבר",
+         "type": "text"
+        }
+       ]
+      },
+      {
+       "name": "link",
+       "label": "הקישור לסרטון",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "about",
+     "label": "קצת עליו",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה",
+       "type": "text"
+      },
+      {
+       "name": "stats",
+       "label": "מספרים",
+       "description": "המספר הגדול והשורה שמתחתיו. אפשר להוסיף, למחוק ולגרור לשינוי הסדר.",
+       "type": "object",
+       "list": {
+        "summary": "{fields.value} {fields.label}"
+       },
+       "fields": [
+        {
+         "name": "value",
+         "label": "המספר (גדול)",
+         "description": "למשל 30+ או כחודש וחצי",
+         "type": "string"
+        },
+        {
+         "name": "label",
+         "label": "השורה שמתחת",
+         "type": "string"
+        }
+       ]
+      },
+      {
+       "name": "link",
+       "label": "הקישור לעמוד אודות",
+       "type": "string"
+      },
+      {
+       "name": "image",
+       "label": "תמונה",
+       "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+       "type": "image"
+      },
+      {
+       "name": "imageAlt",
+       "label": "תיאור התמונה (לעיוורים)",
+       "description": "משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "tracks",
+     "label": "איך עובדים עם עפר (שלושת המסלולים)",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "items",
+       "label": "המסלולים",
+       "description": "בכל כרטיס מופיעות אוטומטית עד ארבע הרצאות של הקהל הזה (מתוך 'הרצאות וסדנאות')",
+       "type": "object",
+       "list": {
+        "summary": "{fields.title}"
+       },
+       "fields": [
+        {
+         "name": "audience",
+         "label": "קהל",
+         "type": "select",
+         "options": {
+          "values": [
+           {
+            "value": "staff",
+            "label": "צוותי חינוך"
+           },
+           {
+            "value": "parents",
+            "label": "הורים"
+           },
+           {
+            "value": "principals",
+            "label": "מנהלים ומסגרות"
+           }
+          ]
+         }
+        },
+        {
+         "name": "title",
+         "label": "כותרת",
+         "type": "string"
+        },
+        {
+         "name": "text",
+         "label": "טקסט",
+         "type": "text"
+        },
+        {
+         "name": "art",
+         "label": "איור",
+         "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+         "type": "image"
+        }
+       ]
+      },
+      {
+       "name": "link",
+       "label": "המילה בתחתית הכרטיס",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "tedx",
+     "label": "הרצאת ה-TEDx",
+     "description": "הסרטון עצמו: הסרטון שסומן 'מוצג בדף הבית' באזור 'וידאו'",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה",
+       "type": "text"
+      },
+      {
+       "name": "button",
+       "label": "הכפתור",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "book",
+     "label": "הספר והקורס",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה ראשונה",
+       "type": "text"
+      },
+      {
+       "name": "text",
+       "label": "פסקה שנייה",
+       "type": "text"
+      },
+      {
+       "name": "image",
+       "label": "הכריכה",
+       "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+       "type": "image"
+      },
+      {
+       "name": "imageAlt",
+       "label": "תיאור התמונה (לעיוורים)",
+       "description": "משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.",
+       "type": "string"
+      },
+      {
+       "name": "button",
+       "label": "כפתור ראשון (לעמוד קולות פעמונים)",
+       "type": "string"
+      },
+      {
+       "name": "button2",
+       "label": "כפתור שני (לאתר הקורס)",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "testimonials",
+     "label": "ממליצים",
+     "description": "ההמלצות עצמן: באזור 'המלצות'",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה",
+       "type": "text"
+      },
+      {
+       "name": "videosLink",
+       "label": "הקישור לכל הסרטונים",
+       "type": "string"
+      },
+      {
+       "name": "writeLink",
+       "label": "הכפתור 'כתבו המלצה'",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "writing",
+     "label": "מהכתיבה של עפר",
+     "description": "המאמרים עצמם: באזור 'מאמרים ומחשבות'",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה",
+       "type": "text"
+      },
+      {
+       "name": "link",
+       "label": "הקישור לכל המאמרים",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    },
+    {
+     "name": "note",
+     "label": "הערה פנימית",
+     "description": "לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.",
+     "type": "text"
+    }
+   ]
+  },
+  "lectures": {
+   "label": "הרצאות וסדנאות (העמוד)",
+   "description": "הטקסטים של העמוד. ההרצאות עצמן: באזור 'הרצאות וסדנאות'.",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "tracks",
+     "label": "המסלולים",
+     "description": "כל מסלול הוא אזור בעמוד עם ההרצאות של הקהל שלו. הסדר כאן הוא הסדר בעמוד.",
+     "type": "object",
+     "list": {
+      "summary": "{fields.title}"
+     },
+     "fields": [
+      {
+       "name": "audience",
+       "label": "קהל",
+       "type": "select",
+       "required": true,
+       "options": {
+        "values": [
+         {
+          "value": "staff",
+          "label": "צוותי חינוך"
+         },
+         {
+          "value": "parents",
+          "label": "הורים"
+         },
+         {
+          "value": "principals",
+          "label": "מנהלים ומסגרות"
+         }
+        ]
+       }
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה",
+       "type": "text"
+      }
+     ]
+    },
+    {
+     "name": "testimonials",
+     "label": "ממליצים",
+     "description": "מופיע אחרי המסלולים כשיש המלצות עם ציטוט",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "writeLink",
+       "label": "הכפתור 'כתבו המלצה'",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "contactTitle",
+     "label": "כותרת הפס הכהה בתחתית",
+     "description": "ריק = הכותרת הרגילה",
+     "type": "string"
+    },
+    {
+     "name": "contactText",
+     "label": "הטקסט בפס הכהה בתחתית",
+     "type": "text"
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    },
+    {
+     "name": "note",
+     "label": "הערה פנימית",
+     "description": "לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.",
+     "type": "text"
+    }
+   ]
+  },
+  "book": {
+   "label": "קולות פעמונים (הספר, הקורס והמועדון)",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "book",
+     "label": "הספר",
+     "type": "object",
+     "fields": [
+      {
+       "name": "nav",
+       "label": "שם הכפתור בראש העמוד",
+       "type": "string"
+      },
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה מודגשת",
+       "type": "text"
+      },
+      {
+       "name": "paragraphs",
+       "label": "פסקאות",
+       "type": "text",
+       "list": true
+      },
+      {
+       "name": "image",
+       "label": "הכריכה",
+       "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+       "type": "image"
+      },
+      {
+       "name": "imageAlt",
+       "label": "תיאור התמונה (לעיוורים)",
+       "description": "משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.",
+       "type": "string"
+      },
+      {
+       "name": "imageCaption",
+       "label": "כיתוב מתחת לכריכה",
+       "type": "string"
+      },
+      {
+       "name": "buttonHe",
+       "label": "הכפתור לספר בעברית",
+       "description": "הקישור עצמו: בהגדרות האתר",
+       "type": "string"
+      },
+      {
+       "name": "buttonEn",
+       "label": "הכפתור לספר באנגלית",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "sentences",
+     "label": "ארבעה משפטים שפותחים את הספר",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "כותרת קטנה",
+       "type": "string"
+      },
+      {
+       "name": "items",
+       "label": "המשפטים",
+       "type": "object",
+       "list": {
+        "summary": "{fields.says}"
+       },
+       "fields": [
+        {
+         "name": "says",
+         "label": "מה אומרים",
+         "description": "כולל המירכאות, למשל ״לילד יש קשיים רגשיים״",
+         "type": "string"
+        },
+        {
+         "name": "answer",
+         "label": "התשובה (מודגשת)",
+         "type": "string"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "course",
+     "label": "הקורס הדיגיטלי",
+     "type": "object",
+     "fields": [
+      {
+       "name": "nav",
+       "label": "שם הכפתור בראש העמוד",
+       "type": "string"
+      },
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "lead",
+       "label": "פסקה מודגשת",
+       "type": "text"
+      },
+      {
+       "name": "paragraphs",
+       "label": "פסקאות",
+       "type": "text",
+       "list": true
+      },
+      {
+       "name": "stats",
+       "label": "מספרים",
+       "description": "המספר הגדול והשורה שמתחתיו. אפשר להוסיף, למחוק ולגרור לשינוי הסדר.",
+       "type": "object",
+       "list": {
+        "summary": "{fields.value} {fields.label}"
+       },
+       "fields": [
+        {
+         "name": "value",
+         "label": "המספר (גדול)",
+         "description": "למשל 30+ או כחודש וחצי",
+         "type": "string"
+        },
+        {
+         "name": "label",
+         "label": "השורה שמתחת",
+         "type": "string"
+        }
+       ]
+      },
+      {
+       "name": "who",
+       "label": "מי השתתף",
+       "type": "text"
+      },
+      {
+       "name": "steps",
+       "label": "שלבי השיטה",
+       "type": "object",
+       "list": {
+        "summary": "{fields.title}"
+       },
+       "fields": [
+        {
+         "name": "title",
+         "label": "שם השלב",
+         "type": "string"
+        },
+        {
+         "name": "text",
+         "label": "הסבר",
+         "type": "text"
+        }
+       ]
+      },
+      {
+       "name": "lessonsTitle",
+       "label": "כותרת רשימת השיעורים",
+       "type": "string"
+      },
+      {
+       "name": "lessons",
+       "label": "השיעורים",
+       "description": "שורה לכל שיעור. אפשר להוסיף, למחוק ולגרור.",
+       "type": "string",
+       "list": true
+      },
+      {
+       "name": "button",
+       "label": "כפתור ההרשמה",
+       "description": "הקישור עצמו: 'אתר הקורס הדיגיטלי' בהגדרות",
+       "type": "string"
+      },
+      {
+       "name": "videosLink",
+       "label": "הקישור מתחת להמלצה",
+       "description": "ההמלצות עצמן (ציטוטים): באזור 'המלצות'",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "club",
+     "label": "המועדון",
+     "type": "object",
+     "fields": [
+      {
+       "name": "nav",
+       "label": "שם הכפתור בראש העמוד",
+       "type": "string"
+      },
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "text",
+       "label": "פסקה",
+       "type": "text"
+      }
+     ]
+    },
+    {
+     "name": "contactTitle",
+     "label": "כותרת הפס הכהה בתחתית",
+     "description": "ריק = הכותרת הרגילה",
+     "type": "string"
+    },
+    {
+     "name": "contactText",
+     "label": "הטקסט בפס הכהה בתחתית",
+     "type": "text"
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    },
+    {
+     "name": "note",
+     "label": "הערה פנימית",
+     "description": "לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.",
+     "type": "text"
+    }
+   ]
+  },
+  "video": {
+   "label": "וידאו ותקשורת (העמוד)",
+   "description": "הטקסטים של העמוד. הסרטונים: באזור 'וידאו'. משתתפים מספרים: באזור 'המלצות'.",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "tedx",
+     "label": "הסרטון הראשי",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה (לפני החודש והשנה)",
+       "type": "string"
+      },
+      {
+       "name": "durationNote",
+       "label": "אחרי אורך הסרטון",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "lectures",
+     "label": "הרצאות ומפגשים",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "voices",
+     "label": "קולות מהשטח",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "youtubeLink",
+       "label": "הקישור לערוץ היוטיוב",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "press",
+     "label": "בתקשורת",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "items",
+       "label": "הופעות בתקשורת",
+       "type": "object",
+       "list": {
+        "summary": "{fields.title}"
+       },
+       "fields": [
+        {
+         "name": "title",
+         "label": "כותרת",
+         "type": "string",
+         "required": true
+        },
+        {
+         "name": "text",
+         "label": "איפה ומתי",
+         "type": "string"
+        },
+        {
+         "name": "url",
+         "label": "קישור",
+         "type": "string",
+         "required": true,
+         "pattern": {
+          "regex": "^https?://",
+          "message": "קישור מלא, שמתחיל ב-https://"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    },
+    {
+     "name": "note",
+     "label": "הערה פנימית",
+     "description": "לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.",
+     "type": "text"
+    }
+   ]
+  },
+  "writing": {
+   "label": "מאמרים ומחשבות (העמוד)",
+   "description": "הטקסטים של העמוד. המאמרים עצמם: באזור 'מאמרים ומחשבות'.",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "facebookNote",
+     "label": "המשפט על דף הפייסבוק",
+     "type": "text"
+    },
+    {
+     "name": "facebookButton",
+     "label": "כפתור הפייסבוק",
+     "type": "string"
+    },
+    {
+     "name": "article",
+     "label": "מילים בעמוד של כל מאמר",
+     "type": "object",
+     "fields": [
+      {
+       "name": "approx",
+       "label": "ליד תאריך משוער",
+       "type": "string"
+      },
+      {
+       "name": "newer",
+       "label": "קישור למאמר החדש יותר",
+       "type": "string"
+      },
+      {
+       "name": "older",
+       "label": "קישור למאמר הקודם",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    },
+    {
+     "name": "note",
+     "label": "הערה פנימית",
+     "description": "לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.",
+     "type": "text"
+    }
+   ]
+  },
+  "about": {
+   "label": "אודות",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "story",
+     "label": "איך נולדה הגישה",
+     "type": "object",
+     "fields": [
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "blocks",
+       "label": "הסיפור",
+       "description": "פסקה אחרי פסקה. מוסיפים 'פסקה' או 'ציטוט', ואפשר לגרור לשינוי הסדר.",
+       "type": "block",
+       "list": true,
+       "blocks": [
+        {
+         "name": "paragraph",
+         "label": "פסקה",
+         "fields": [
+          {
+           "name": "text",
+           "label": "טקסט",
+           "type": "text"
+          }
+         ]
+        },
+        {
+         "name": "quote",
+         "label": "ציטוט",
+         "fields": [
+          {
+           "name": "text",
+           "label": "הציטוט (עם המירכאות)",
+           "type": "text"
+          },
+          {
+           "name": "cite",
+           "label": "של מי",
+           "type": "string"
+          }
+         ]
+        }
+       ],
+       "blockKey": "type"
+      },
+      {
+       "name": "image",
+       "label": "תמונה",
+       "description": "בוחרים מספריית התמונות או מעלים חדשה (jpg, png או webp). האתר מקטין ומכווץ אותה לבד.",
+       "type": "image"
+      },
+      {
+       "name": "imageAlt",
+       "label": "תיאור התמונה (לעיוורים)",
+       "description": "משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.",
+       "type": "string"
+      },
+      {
+       "name": "button",
+       "label": "הכפתור מתחת לתמונה",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "facts",
+     "label": "תחנות ועובדות",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "items",
+       "label": "העובדות",
+       "type": "object",
+       "list": {
+        "summary": "{fields.title}"
+       },
+       "fields": [
+        {
+         "name": "title",
+         "label": "כותרת",
+         "type": "string",
+         "required": true
+        },
+        {
+         "name": "text",
+         "label": "טקסט",
+         "type": "text"
+        },
+        {
+         "name": "source",
+         "label": "קישור למקור (לא מוצג באתר)",
+         "type": "string"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "name": "field",
+     "label": "גם בשטח (התמונה עם הילדים)",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "image",
+       "label": "תמונה",
+       "description": "ריק = האזור לא מוצג",
+       "type": "image"
+      },
+      {
+       "name": "imageAlt",
+       "label": "תיאור התמונה (לעיוורים)",
+       "description": "משפט קצר שמתאר מה רואים בתמונה. קוראי מסך מקריאים אותו.",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    },
+    {
+     "name": "note",
+     "label": "הערה פנימית",
+     "description": "לא מוצגת באתר. מקום לרשום לעצמכם מקור, תזכורת או מה עוד צריך להשלים.",
+     "type": "text"
+    }
+   ]
+  },
+  "contact": {
+   "label": "יצירת קשר",
+   "description": "הטלפון, המייל והפייסבוק עצמם: ב'פרטי קשר והגדרות'",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "form",
+     "label": "הטופס",
+     "type": "object",
+     "fields": [
+      {
+       "name": "name",
+       "label": "שדה השם",
+       "type": "string"
+      },
+      {
+       "name": "org",
+       "label": "שדה בית ספר / ארגון",
+       "type": "string"
+      },
+      {
+       "name": "phone",
+       "label": "שדה הטלפון",
+       "type": "string"
+      },
+      {
+       "name": "email",
+       "label": "שדה המייל",
+       "type": "string"
+      },
+      {
+       "name": "topic",
+       "label": "שדה הנושא",
+       "type": "string"
+      },
+      {
+       "name": "topics",
+       "label": "האפשרויות בשדה הנושא",
+       "type": "string",
+       "list": true
+      },
+      {
+       "name": "message",
+       "label": "שדה ההודעה",
+       "type": "string"
+      },
+      {
+       "name": "messagePlaceholder",
+       "label": "הטקסט האפור בשדה ההודעה",
+       "type": "string"
+      },
+      {
+       "name": "button",
+       "label": "כפתור השליחה",
+       "type": "string"
+      },
+      {
+       "name": "note",
+       "label": "ההערה מתחת לכפתור",
+       "description": "המילה {email} מוחלפת בכתובת המייל מההגדרות",
+       "type": "text"
+      }
+     ]
+    },
+    {
+     "name": "direct",
+     "label": "או ישירות",
+     "type": "object",
+     "fields": [
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "whatsapp",
+       "label": "קישור הוואטסאפ",
+       "type": "string"
+      },
+      {
+       "name": "facebook",
+       "label": "קישור הפייסבוק",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "note",
+     "label": "הערה מתחת לפרטי הקשר",
+     "description": "לא חובה. מוצגת באתר.",
+     "type": "text"
+    },
+    {
+     "name": "recommend",
+     "label": "הקישור לכתיבת המלצה",
+     "type": "object",
+     "fields": [
+      {
+       "name": "text",
+       "label": "השאלה",
+       "type": "string"
+      },
+      {
+       "name": "link",
+       "label": "הקישור",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    }
+   ]
+  },
+  "recommend": {
+   "label": "כתבו המלצה (הטופס)",
+   "description": "הטופס שבו אנשים כותבים המלצה. הוא פותח וואטסאפ (או מייל) לעפר עם ההמלצה כתובה; שום דבר לא נשמר באתר. כדי לפרסם המלצה שהתקבלה מוסיפים אותה באזור 'המלצות'.",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "kicker",
+     "label": "שורה קטנה מעל הכותרת",
+     "type": "string"
+    },
+    {
+     "name": "intro",
+     "label": "פסקת פתיחה",
+     "type": "text"
+    },
+    {
+     "name": "form",
+     "label": "הטופס",
+     "type": "object",
+     "fields": [
+      {
+       "name": "name",
+       "label": "שדה השם",
+       "type": "string"
+      },
+      {
+       "name": "role",
+       "label": "שדה התפקיד",
+       "type": "string"
+      },
+      {
+       "name": "rolePlaceholder",
+       "label": "הטקסט האפור בשדה התפקיד",
+       "type": "string"
+      },
+      {
+       "name": "text",
+       "label": "שדה ההמלצה",
+       "type": "string"
+      },
+      {
+       "name": "consent",
+       "label": "תיבת האישור לפרסום",
+       "type": "string"
+      },
+      {
+       "name": "whatsappButton",
+       "label": "כפתור הוואטסאפ",
+       "type": "string"
+      },
+      {
+       "name": "mailButton",
+       "label": "כפתור המייל",
+       "type": "string"
+      },
+      {
+       "name": "note",
+       "label": "ההערה מתחת לכפתורים",
+       "type": "string"
+      },
+      {
+       "name": "messageIntro",
+       "label": "השורה הראשונה בהודעה שמגיעה לעפר",
+       "type": "string"
+      },
+      {
+       "name": "mailSubject",
+       "label": "נושא המייל",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    }
+   ]
+  },
+  "accessibility": {
+   "label": "הצהרת נגישות",
+   "fields": [
+    {
+     "name": "title",
+     "label": "כותרת",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "body",
+     "label": "הטקסט",
+     "type": "html",
+     "description": "אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\"."
+    },
+    {
+     "name": "seoTitle",
+     "label": "כותרת לגוגל ולשיתוף",
+     "description": "לא חובה. מופיעה בלשונית הדפדפן, בגוגל ובשיתוף בוואטסאפ. ריק = כותרת העמוד.",
+     "type": "string"
+    },
+    {
+     "name": "seoDescription",
+     "label": "תיאור לגוגל ולשיתוף",
+     "description": "לא חובה. משפט או שניים שמופיעים בגוגל ובשיתוף בוואטסאפ. אפשר לכתוב {phone} או {email}: האתר מציג במקומם את הטלפון והמייל מ\"פרטי קשר והגדרות\".",
+     "type": "text"
+    }
+   ]
+  },
+  "layout": {
+   "label": "תפריט, כותרת ותחתית",
+   "description": "מה שמופיע בכל העמודים: התפריט, הכפתור בראש העמוד, הפס הכהה 'רוצים את עפר אצלכם?', התחתית ועמוד 404.",
+   "fields": [
+    {
+     "name": "menu",
+     "label": "התפריט",
+     "description": "הסדר כאן הוא הסדר בתפריט. אפשר לגרור, למחוק עמוד מהתפריט או להוסיף. בתחתית האתר מופיעים כל העמודים שבתפריט חוץ מדף הבית ויצירת קשר.",
+     "type": "object",
+     "list": {
+      "summary": "{fields.label}"
+     },
+     "fields": [
+      {
+       "name": "link",
+       "label": "עמוד",
+       "type": "select",
+       "required": true,
+       "options": {
+        "values": [
+         {
+          "value": "/",
+          "label": "דף הבית"
+         },
+         {
+          "value": "/lectures/",
+          "label": "הרצאות וסדנאות"
+         },
+         {
+          "value": "/kolot-paamonim/",
+          "label": "קולות פעמונים"
+         },
+         {
+          "value": "/video/",
+          "label": "וידאו"
+         },
+         {
+          "value": "/writing/",
+          "label": "מאמרים ומחשבות"
+         },
+         {
+          "value": "/about/",
+          "label": "אודות"
+         },
+         {
+          "value": "/contact/",
+          "label": "יצירת קשר"
+         },
+         {
+          "value": "/recommend/",
+          "label": "כתבו המלצה"
+         },
+         {
+          "value": "/accessibility/",
+          "label": "הצהרת נגישות"
+         }
+        ]
+       }
+      },
+      {
+       "name": "label",
+       "label": "השם בתפריט",
+       "type": "string",
+       "required": true
+      },
+      {
+       "name": "note",
+       "label": "שורה קטנה מתחת לשם (בתפריט בטלפון)",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "header",
+     "label": "ראש העמוד",
+     "type": "object",
+     "fields": [
+      {
+       "name": "button",
+       "label": "הכפתור בראש העמוד",
+       "type": "string"
+      },
+      {
+       "name": "menuTitle",
+       "label": "הכותרת בתחתית התפריט בטלפון",
+       "type": "string"
+      },
+      {
+       "name": "menuWhatsapp",
+       "label": "כפתור וואטסאפ בתפריט",
+       "type": "string"
+      },
+      {
+       "name": "menuPhone",
+       "label": "כפתור טלפון בתפריט",
+       "type": "string"
+      },
+      {
+       "name": "menuEmail",
+       "label": "כפתור מייל בתפריט",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "contactBand",
+     "label": "הפס הכהה בתחתית העמודים",
+     "type": "object",
+     "fields": [
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "text",
+       "label": "טקסט",
+       "type": "text"
+      },
+      {
+       "name": "whatsapp",
+       "label": "כפתור הוואטסאפ",
+       "type": "string"
+      },
+      {
+       "name": "form",
+       "label": "כפתור הטופס",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "whatsappMessage",
+     "label": "ההודעה שנפתחת בוואטסאפ",
+     "description": "הטקסט שכבר כתוב כשמישהו לוחץ על וואטסאפ באתר",
+     "type": "string"
+    },
+    {
+     "name": "footer",
+     "label": "התחתית",
+     "type": "object",
+     "fields": [
+      {
+       "name": "text",
+       "label": "המשפט מתחת לשם",
+       "type": "text"
+      },
+      {
+       "name": "pagesTitle",
+       "label": "כותרת רשימת העמודים",
+       "type": "string"
+      },
+      {
+       "name": "contactTitle",
+       "label": "כותרת יצירת הקשר",
+       "type": "string"
+      },
+      {
+       "name": "whatsapp",
+       "label": "קישור הוואטסאפ",
+       "type": "string"
+      },
+      {
+       "name": "form",
+       "label": "קישור לטופס הפנייה",
+       "type": "string"
+      },
+      {
+       "name": "recommend",
+       "label": "קישור ל'כתבו המלצה'",
+       "description": "ריק = לא מופיע",
+       "type": "string"
+      },
+      {
+       "name": "course",
+       "label": "קישור לקורס",
+       "type": "string"
+      },
+      {
+       "name": "copyright",
+       "label": "זכויות יוצרים",
+       "type": "string"
+      },
+      {
+       "name": "accessibility",
+       "label": "קישור להצהרת הנגישות",
+       "type": "string"
+      }
+     ]
+    },
+    {
+     "name": "notFound",
+     "label": "עמוד 404 (כתובת שלא קיימת)",
+     "type": "object",
+     "fields": [
+      {
+       "name": "pageTitle",
+       "label": "הכותרת בלשונית",
+       "type": "string"
+      },
+      {
+       "name": "kicker",
+       "label": "שורה קטנה",
+       "type": "string"
+      },
+      {
+       "name": "title",
+       "label": "כותרת",
+       "type": "string"
+      },
+      {
+       "name": "text",
+       "label": "טקסט",
+       "type": "text"
+      },
+      {
+       "name": "button",
+       "label": "הכפתור",
+       "type": "string"
+      }
+     ]
+    }
+   ]
+  },
+  "settings": {
+   "label": "פרטי קשר והגדרות",
+   "description": "הטלפון והמייל מופיעים בכל האתר: בתפריט, בפס הכהה, בתחתית ובטופס. משנים כאן פעם אחת.",
+   "fields": [
+    {
+     "name": "siteName",
+     "label": "שם האתר",
+     "description": "מופיע בראש כל עמוד ובלשונית הדפדפן",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "siteTagline",
+     "label": "סלוגן",
+     "description": "מופיע ליד השם: פשוט מחנך",
+     "type": "string"
+    },
+    {
+     "name": "role",
+     "label": "תפקיד (לגוגל)",
+     "type": "string"
+    },
+    {
+     "name": "phone",
+     "label": "טלפון (גם לוואטסאפ)",
+     "type": "string",
+     "required": true,
+     "pattern": {
+      "regex": "^0\\d{1,2}-?\\d{3}-?\\d{4}$",
+      "message": "מספר ישראלי, למשל 050-313-7261"
+     }
+    },
+    {
+     "name": "email",
+     "label": "מייל",
+     "description": "לכאן מגיעות הפניות מהטופס",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "facebook",
+     "label": "דף הפייסבוק",
+     "type": "string"
+    },
+    {
+     "name": "youtube",
+     "label": "ערוץ היוטיוב",
+     "type": "string"
+    },
+    {
+     "name": "courseUrl",
+     "label": "אתר הקורס הדיגיטלי",
+     "type": "string",
+     "required": true
+    },
+    {
+     "name": "bookUrlHe",
+     "label": "קישור לספר בעברית",
+     "type": "string"
+    },
+    {
+     "name": "bookUrlEn",
+     "label": "קישור לספר באנגלית",
+     "type": "string"
+    },
+    {
+     "name": "podcastUrl",
+     "label": "קישור לפודקאסט",
+     "type": "string"
+    },
+    {
+     "name": "noindex",
+     "label": "להסתיר מגוגל (עד אישור)",
+     "description": "כל עוד מסומן, גוגל לא מאנדקס את האתר",
+     "type": "boolean"
+    }
+   ]
+  }
+ },
+ "groups": [
+  {
+   "name": "site_pages",
+   "label": "עמודי האתר",
+   "items": [
+    "home",
+    "lectures",
+    "book",
+    "video",
+    "writing",
+    "about",
+    "contact",
+    "recommend",
+    "accessibility"
+   ]
+  }
+ ]
+}

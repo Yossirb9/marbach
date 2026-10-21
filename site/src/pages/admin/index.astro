@@ -1,0 +1,50 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { env } from 'cloudflare:workers';
+import { withBase } from '../../lib/data';
+import { fmt } from '../../lib/adminFmt';
+const db = env.DB;
+const [counts, pending, recent] = await db.batch([
+  db.prepare(`SELECT collection, COUNT(*) AS n, SUM(CASE WHEN json_extract(data, '$.draft') = 1 THEN 1 ELSE 0 END) AS drafts FROM entries GROUP BY collection`),
+  db.prepare(`SELECT COUNT(*) AS n FROM submissions WHERE status = 'pending'`),
+  db.prepare(`SELECT ref, at, by FROM revisions WHERE by != 'seed' ORDER BY id DESC LIMIT 8`),
+]);
+const n = Object.fromEntries((counts.results as { collection: string; n: number; drafts: number }[]).map((r) => [r.collection, r]));
+const waiting = (pending.results[0] as { n: number }).n;
+const NAMES: Record<string, string> = { home: 'דף הבית', lectures: 'עמוד ההרצאות', book: 'קולות פעמונים', video: 'עמוד הווידאו', writing: 'עמוד המאמרים', about: 'אודות', contact: 'יצירת קשר', recommend: 'כתבו המלצה', accessibility: 'הצהרת נגישות', settings: 'פרטי קשר והגדרות', layout: 'תפריט, כותרת ותחתית', articles: 'מאמר', talks: 'הרצאה', videos: 'סרטון', testimonials: 'המלצה' };
+const tiles = [
+  { href: '/admin/pages/', title: 'עמודי האתר', text: 'כל הטקסטים בכל עמוד: דף הבית, אודות, הרצאות, קולות פעמונים ועוד' },
+  { href: '/admin/list/articles/', title: 'מאמרים', text: `${n.articles?.n ?? 0} מאמרים${n.articles?.drafts ? `, מהם ${n.articles.drafts} טיוטות` : ''}` },
+  { href: '/admin/list/talks/', title: 'הרצאות וסדנאות', text: `${n.talks?.n ?? 0} הרצאות` },
+  { href: '/admin/list/videos/', title: 'סרטונים', text: `${n.videos?.n ?? 0} סרטונים מיוטיוב` },
+  { href: '/admin/list/testimonials/', title: 'המלצות', text: `${n.testimonials?.n ?? 0} המלצות באתר` },
+  { href: '/admin/inbox/', title: 'ממתינות לאישור', text: waiting ? `${waiting} המלצות חדשות מחכות לך` : 'אין המלצות חדשות', hot: waiting > 0 },
+  { href: '/admin/edit/layout/', title: 'תפריט, כותרת ותחתית', text: 'סדר התפריט, הכפתורים, התחתית ועמוד 404' },
+  { href: '/admin/edit/settings/', title: 'פרטי קשר והגדרות', text: 'טלפון, מייל, קישורים לפייסבוק, יוטיוב, הספר והקורס' },
+  { href: '/admin/media/', title: 'תמונות', text: 'ספריית התמונות: העלאה ומחיקה' },
+];
+---
+<Admin title="לוח הבקרה" screen="home" active="home">
+  <h1>שלום{Astro.locals.user?.display_name ? `, ${Astro.locals.user.display_name}` : ''}</h1>
+  <p class="lead">מה רוצים לעדכן היום? כל שמירה מופיעה באתר מיד.</p>
+  <div class="tiles">
+    {tiles.map((t) => <a class:list={['tile', t.hot && 'tile-hot']} href={withBase(t.href)}><strong>{t.title}</strong><span>{t.text}</span></a>)}
+  </div>
+  <div class="quick">
+    <a class="btn btn-primary" href={withBase('/admin/entry/articles/new/')}>+ מאמר חדש</a>
+    <a class="btn" href={withBase('/admin/entry/videos/new/')}>+ סרטון חדש</a>
+    <a class="btn btn-ghost" href={withBase('/')} target="_blank" rel="noopener">לצפייה באתר ↗</a>
+  </div>
+  {recent.results.length > 0 && (
+    <section class="card">
+      <h2 class="h3">שינויים אחרונים</h2>
+      <ul class="recent">
+        {(recent.results as { ref: string; at: number; by: string }[]).map((r) => {
+          const [a, b] = r.ref.split('/');
+          const href = b ? `/admin/entry/${a}/${b}/` : `/admin/edit/${a}/`;
+          return <li><a href={withBase(href)}>{NAMES[a] ?? a}{b ? ` (${b})` : ''}</a> <span class="muted">{fmt(r.at)}{r.by ? ` · ${r.by}` : ''}</span></li>;
+        })}
+      </ul>
+    </section>
+  )}
+</Admin>

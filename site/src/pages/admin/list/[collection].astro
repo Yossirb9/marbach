@@ -1,0 +1,52 @@
+---
+// a list: articles (newest first, drafts marked), talks / videos / testimonials (in their order on the site; drag to change)
+import Admin from '../../../layouts/Admin.astro';
+import spec from '../../../admin/formspec.json';
+import { env } from 'cloudflare:workers';
+import { isCollection } from '../../../lib/schema';
+import { jsonForScript, withBase, heDate } from '../../../lib/data';
+const c = Astro.params.collection ?? '';
+if (!isCollection(c)) return Astro.rewrite('/404/');
+const s = (spec.collections as Record<string, { label: string; description?: string }>)[c];
+const r = await env.DB.prepare(`SELECT id, data FROM entries WHERE collection = ?1`).bind(c).all<{ id: string; data: string }>();
+type D = Record<string, unknown>;
+const rows = r.results.map((x) => ({ id: x.id, d: JSON.parse(x.data) as D }));
+const sortable = c !== 'articles';
+const label = (d: D, id: string) => String(d.title ?? d.name ?? id);
+if (c === 'articles') rows.sort((a, b) => String(b.d.date).localeCompare(String(a.d.date)));
+else rows.sort((a, b) => (Number(a.d.order ?? 1e9) - Number(b.d.order ?? 1e9)) || label(a.d, a.id).localeCompare(label(b.d, b.id), 'he'));
+const AUD: Record<string, string> = { staff: 'צוותי חינוך', parents: 'הורים', principals: 'מנהלים', all: 'מחנכים והורים' };
+const KIND: Record<string, string> = { talk: 'הסרטון הראשי', lecture: 'הרצאות ומפגשים' };
+const NEW: Record<string, string> = { articles: '+ מאמר חדש', talks: '+ הרצאה חדשה', videos: '+ סרטון חדש', testimonials: '+ המלצה חדשה' };
+const WARN = new Set(['טיוטה', 'מוסתר']);
+const meta = (d: D): string[] => {
+  if (c === 'articles') return [d.date ? heDate(String(d.date)) : '', d.draft ? 'טיוטה' : ''].filter(Boolean);
+  if (c === 'talks') return [AUD[String(d.audience)] ?? ''];
+  if (c === 'videos') return [KIND[String(d.kind)] ?? '', d.featured ? 'בדף הבית' : ''].filter(Boolean);
+  return [d.quote ? 'ציטוט' : '', d.youtube ? 'סרטון' : '', d.hidden ? 'מוסתר' : ''].filter(Boolean);
+};
+---
+<Admin title={s.label} screen="list" active={c}>
+  <div class="page-head">
+    <h1>{s.label}</h1>
+    <a class="btn btn-primary" href={withBase(`/admin/entry/${c}/new/`)}>{NEW[c]}</a>
+  </div>
+  {s.description && <p class="lead">{s.description}</p>}
+  {sortable && <p class="help">הסדר כאן הוא הסדר באתר. גוררים את ⋮⋮ (או לוחצים על החצים) כדי לשנות. הסדר נשמר מיד.</p>}
+  {rows.length > 6 && <input id="filter" class="input filter" type="search" placeholder="חיפוש ברשימה" />}
+  <ol id="entries" class:list={['rows', sortable && 'rows-sortable']}>
+    {rows.map((x, i) => (
+      <li class="row" data-id={x.id}>
+        {sortable && <span class="drag" title="גוררים כדי לשנות את הסדר" aria-hidden="true">⋮⋮</span>}
+        {sortable && <span class="order-num muted">{i + 1}</span>}
+        <a class="row-main" href={withBase(`/admin/entry/${c}/${x.id}/`)}>
+          <strong>{label(x.d, x.id)}</strong>
+          <span class="tags">{meta(x.d).map((m) => <span class:list={['tag', WARN.has(m) && 'tag-warn']}>{m}</span>)}</span>
+        </a>
+        {sortable && <span class="row-move"><button type="button" class="icon-btn" data-move="up" aria-label="להזיז למעלה">▲</button><button type="button" class="icon-btn" data-move="down" aria-label="להזיז למטה">▼</button></span>}
+      </li>
+    ))}
+  </ol>
+  {!rows.length && <p class="muted">אין עדיין פריטים.</p>}
+  <script type="application/json" id="boot" set:html={jsonForScript({ collection: c, sortable })} />
+</Admin>

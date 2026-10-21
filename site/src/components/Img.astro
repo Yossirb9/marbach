@@ -1,5 +1,6 @@
 ---
-import { img } from '../lib/data';
+import { useData } from '../lib/data';
+const { img } = useData(Astro.locals);
 interface Props { src: string; alt: string; sizes?: string; class?: string; eager?: boolean; lightbox?: boolean; style?: string; [k: `data-${string}`]: unknown }
 const { src, alt, sizes, class: cls, eager = false, lightbox = false, style, ...rest } = Astro.props;
 const a = img(src, sizes);

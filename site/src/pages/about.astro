@@ -3,7 +3,8 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Img from '../components/Img.astro';
 import ContactBand from '../components/ContactBand.astro';
-import { page, withBase } from '../lib/data';
+import { useData, withBase } from '../lib/data';
+const { page } = useData(Astro.locals);
 // every text on this page: src/content/pages/about.json (CMS: עמודי האתר → אודות)
 const p = await page('about');
 const { story, facts, field } = p;

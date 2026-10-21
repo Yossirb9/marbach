@@ -1,0 +1,56 @@
+---
+// "ממתינות לאישור": recommendations sent from /recommend/. Approve (with corrections) → a testimonial on the site.
+import Admin from '../../layouts/Admin.astro';
+import { env } from 'cloudflare:workers';
+import { withBase } from '../../lib/data';
+import { fmt } from '../../lib/adminFmt';
+const TABS = { pending: 'ממתינות', approved: 'פורסמו', rejected: 'לא פורסמו' } as const;
+type Tab = keyof typeof TABS;
+const q = Astro.url.searchParams.get('tab');
+const tab: Tab = q === 'approved' || q === 'rejected' ? q : 'pending';
+const r = await env.DB.prepare(`SELECT id, name, role, text, consent, status, created_at, decided_at, decided_by, testimonial_id FROM submissions
+  WHERE status = ?1 ORDER BY created_at DESC LIMIT 200`).bind(tab).all<{ id: number; name: string; role: string; text: string; consent: number; created_at: number; decided_at: number; decided_by: string; testimonial_id: string }>();
+const items = r.results;
+---
+<Admin title="ממתינות לאישור" screen="inbox" active="inbox">
+  <h1>המלצות מהאתר</h1>
+  <p class="lead">מה שנשלח בטופס "כתבו המלצה". אפשר לתקן שגיאות כתיב לפני האישור. אחרי "אישור ופרסום" ההמלצה מופיעה באתר מיד (ואפשר לערוך או להסתיר אותה ב"המלצות").</p>
+  <nav class="tabs">
+    {(Object.keys(TABS) as Tab[]).map((t) => <a href={withBase(`/admin/inbox/?tab=${t}`)} aria-current={t === tab ? 'page' : undefined}>{TABS[t]}</a>)}
+  </nav>
+  <p id="inbox-empty" class="muted" hidden={items.length > 0}>{tab === 'pending' ? 'אין המלצות חדשות.' : 'אין כאן כלום.'}</p>
+  <div class="subs">
+    {items.map((s) => (
+      <article class="card sub" data-sub={s.id} data-consent={s.consent}>
+        <p class="sub-meta muted">
+          {fmt(s.created_at)}
+          {s.consent ? <span class="tag">הסכים/ה לפרסום</span> : <span class="tag tag-warn">לא סומנה הסכמה לפרסום</span>}
+          {tab !== 'pending' && s.decided_by && <span> · {TABS[tab]} ע״י {s.decided_by}</span>}
+        </p>
+        {tab === 'pending' ? (
+          <>
+            <div class="sub-grid">
+              <label class="field"><span class="label">שם</span><input class="input" name="name" value={s.name} dir="auto" /></label>
+              <label class="field"><span class="label">תפקיד / קשר לעפר</span><input class="input" name="role" value={s.role} dir="auto" /></label>
+            </div>
+            <label class="field"><span class="label">ההמלצה</span><textarea class="input" name="quote" rows="5" dir="auto">{s.text}</textarea></label>
+            <div class="row-actions">
+              <button type="button" class="btn btn-primary" data-act="approve">אישור ופרסום באתר</button>
+              <button type="button" class="btn btn-ghost" data-act="reject">לא לפרסם</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p><strong>{s.name}</strong>{s.role && <span class="muted"> · {s.role}</span>}</p>
+            <blockquote class="sub-text">{s.text}</blockquote>
+            <div class="row-actions">
+              {tab === 'approved' && s.testimonial_id && <a class="btn btn-small" href={withBase(`/admin/entry/testimonials/${s.testimonial_id}/`)}>לעריכת ההמלצה באתר</a>}
+              {tab === 'rejected' && <button type="button" class="btn btn-small" data-act="restore">החזרה לממתינות</button>}
+              {tab === 'rejected' && <button type="button" class="btn btn-small btn-danger-ghost" data-act="delete">מחיקה סופית</button>}
+            </div>
+          </>
+        )}
+      </article>
+    ))}
+  </div>
+</Admin>

@@ -5,7 +5,8 @@ import YouTube from '../components/YouTube.astro';
 import Icon from '../components/Icon.astro';
 import Rings from '../components/Rings.astro';
 import ContactBand from '../components/ContactBand.astro';
-import { page, videos, testimonials, testimonialVideo, settings, heMonth } from '../lib/data';
+import { useData, heMonth } from '../lib/data';
+const { page, videos, testimonials, testimonialVideo, settings } = useData(Astro.locals);
 // texts: src/content/pages/video.json; the videos: src/content/videos (CMS: וידאו); participants: src/content/testimonials (CMS: המלצות)
 const p = await page('video');
 const tedx = videos.find((v) => v.kind === 'talk');

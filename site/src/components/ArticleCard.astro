@@ -1,5 +1,6 @@
 ---
-import { img, heDate, articleUrl } from '../lib/data';
+import { useData, heDate, articleUrl } from '../lib/data';
+const { img } = useData(Astro.locals);
 interface Props { article: { title: string; slug: string; date: string; excerpt: string; image?: string; imageAlt: string; sourceLabel: string } }
 const { article: a } = Astro.props;
 const th = a.image ? img(a.image, '(max-width: 760px) 100vw, 380px') : null;

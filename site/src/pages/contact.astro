@@ -2,7 +2,8 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import Icon from '../components/Icon.astro';
-import { page, settings, CONTACT, withBase } from '../lib/data';
+import { useData, withBase } from '../lib/data';
+const { page, settings, CONTACT } = useData(Astro.locals);
 // every text on this page: src/content/pages/contact.json (CMS: עמודי האתר → יצירת קשר); phone/mail: settings.json
 const p = await page('contact');
 const { form: f, direct, recommend } = p;

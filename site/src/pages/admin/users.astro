@@ -1,0 +1,15 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import { jsonForScript, withBase } from '../../lib/data';
+const me = Astro.locals.user!;
+if (me.role !== 'admin') return Astro.redirect(withBase('/admin/'), 303);
+---
+<Admin title="משתמשים" screen="users" active="users">
+  <div class="page-head">
+    <h1>משתמשים</h1>
+    <button type="button" class="btn btn-primary" id="add-user">+ משתמש חדש</button>
+  </div>
+  <p class="lead">מי יכול להיכנס לניהול. "עורך/ת תוכן" עורך/ת הכל חוץ ממשתמשים; "מנהל/ת" גם מוסיף/ה משתמשים ומאפס/ת סיסמאות. אין שליחת סיסמאות במייל: הסיסמה מוצגת כאן פעם אחת ומעבירים אותה ביד.</p>
+  <ul id="users" class="rows"></ul>
+  <script type="application/json" id="boot" set:html={jsonForScript({ me: me.id })} />
+</Admin>

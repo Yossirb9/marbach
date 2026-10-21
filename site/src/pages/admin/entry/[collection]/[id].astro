@@ -1,0 +1,28 @@
+---
+// editing one entry (or a new one: id "new")
+import Admin from '../../../../layouts/Admin.astro';
+import spec from '../../../../admin/formspec.json';
+import { env } from 'cloudflare:workers';
+import { isCollection } from '../../../../lib/schema';
+import { getRaw } from '../../../../lib/content';
+import { jsonForScript, withBase } from '../../../../lib/data';
+import { publicPath } from '../../../../lib/publicUrl';
+const c = Astro.params.collection ?? '';
+const id = Astro.params.id ?? '';
+if (!isCollection(c) || !/^(new|[\w-]{1,64})$/.test(id)) return Astro.rewrite('/404/');
+const s = (spec.collections as Record<string, { label: string; fields: unknown[] }>)[c];
+const raw = id === 'new' ? null : await getRaw(env.DB, 'entry', c, id);
+if (id !== 'new' && !raw) return Astro.rewrite('/404/');
+const d = (raw?.data ?? {}) as Record<string, unknown>;
+const NEW_TITLE: Record<string, string> = { articles: 'מאמר חדש', talks: 'הרצאה חדשה', videos: 'סרטון חדש', testimonials: 'המלצה חדשה' };
+const title = id === 'new' ? NEW_TITLE[c] : String(d.title ?? d.name ?? id);
+const bootData = { kind: 'entry', name: c, id, fields: s.fields, data: raw?.data ?? null, updated_at: raw?.updated_at ?? 0,
+  viewUrl: publicPath('entry', `${c}/${id}`, d), listUrl: withBase(`/admin/list/${c}/`), deletable: true, title };
+---
+<Admin title={title} screen="editor" active={c}>
+  <p class="crumbs"><a href={withBase(`/admin/list/${c}/`)}>{s.label}</a> ›</p>
+  <h1>{title}</h1>
+  <div id="editor"></div>
+  <script type="application/json" id="boot" set:html={jsonForScript(bootData)} />
+  <script>import '../../../../admin/editor.ts';</script>
+</Admin>

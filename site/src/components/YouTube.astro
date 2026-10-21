@@ -3,7 +3,8 @@
 // The poster is a local image from the media library when one was chosen; otherwise YouTube's own thumbnail, so a video
 // added in the CMS with nothing but its id still gets a picture.
 import Icon from './Icon.astro';
-import { img, heMonth, type Video } from '../lib/data';
+import { useData, heMonth, type Video } from '../lib/data';
+const { img } = useData(Astro.locals);
 interface Props { video: Video; meta?: boolean; sizes?: string; eager?: boolean }
 const { video, meta = true, sizes = '(max-width: 760px) 100vw, 760px', eager = false } = Astro.props;
 const p = video.poster ? img(video.poster, sizes) : null;

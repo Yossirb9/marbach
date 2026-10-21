@@ -2,7 +2,8 @@
 // The opening of every inner page: title + lead on the right, one drawing floating on the left (its own parallax
 // layer), and the bells' rings behind both (a slower layer).
 import Rings from './Rings.astro';
-import { img } from '../lib/data';
+import { useData } from '../lib/data';
+const { img } = useData(Astro.locals);
 interface Props { kicker?: string; title: string; intro?: string; art?: string }
 const { kicker, title, intro, art } = Astro.props;
 const a = art ? img(art, '(max-width: 760px) 78vw, 520px') : null;

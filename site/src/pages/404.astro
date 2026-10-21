@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Rings from '../components/Rings.astro';
-import { withBase, layout, settings } from '../lib/data';
+import { useData, withBase } from '../lib/data';
+const { layout, settings } = useData(Astro.locals);
 // texts: src/content/layout.json → notFound (CMS: תפריט, כותרת ותחתית)
 const t = layout.notFound;
 ---

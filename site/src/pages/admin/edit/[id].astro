@@ -1,0 +1,24 @@
+---
+// editing one fixed document: a page, the settings ("פרטי קשר והגדרות") or the layout ("תפריט, כותרת ותחתית")
+import Admin from '../../../layouts/Admin.astro';
+import spec from '../../../admin/formspec.json';
+import { env } from 'cloudflare:workers';
+import { isSingleton } from '../../../lib/schema';
+import { getRaw } from '../../../lib/content';
+import { jsonForScript, withBase } from '../../../lib/data';
+import { publicPath } from '../../../lib/publicUrl';
+const id = Astro.params.id ?? '';
+const s = (spec.singletons as Record<string, { label: string; description?: string; fields: unknown[] }>)[id];
+if (!isSingleton(id) || !s) return Astro.rewrite('/404/');
+const raw = await getRaw(env.DB, 'singleton', '', id);
+const isPage = !['settings', 'layout'].includes(id);
+const bootData = { kind: 'singleton', name: id, id, fields: s.fields, data: raw?.data ?? null, updated_at: raw?.updated_at ?? 0, viewUrl: publicPath('singleton', id) };
+---
+<Admin title={s.label} screen="editor" active={isPage ? 'pages' : id}>
+  {isPage && <p class="crumbs"><a href={withBase('/admin/pages/')}>עמודי האתר</a> ›</p>}
+  <h1>{s.label}</h1>
+  {s.description && <p class="lead">{s.description}</p>}
+  <div id="editor"></div>
+  <script type="application/json" id="boot" set:html={jsonForScript(bootData)} />
+  <script>import '../../../admin/editor.ts';</script>
+</Admin>

@@ -3,14 +3,15 @@ import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 import ContactBand from '../components/ContactBand.astro';
 import Testimonials from '../components/Testimonials.astro';
-import { page, talks, img, withBase } from '../lib/data';
+import { useData, withBase, siteOrigin } from '../lib/data';
+const { page, talks, img } = useData(Astro.locals);
 // texts: src/content/pages/lectures.json (CMS: עמודי האתר → הרצאות וסדנאות); the talks themselves: src/content/talks
 const p = await page('lectures');
 // three tracks; a talk for "all" appears with the staff and with the parents
 const TRACKS = p.tracks.map((t) => ({ key: t.audience, title: t.title, lead: t.lead }));
 const of = (k: string) => talks.filter((t) => t.audience === k || (t.audience === 'all' && k === 'staff'));
 const ld = talks.map((t) => ({ '@context': 'https://schema.org', '@type': 'Service', name: t.title, description: t.summary, serviceType: 'הרצאה / סדנה',
-  provider: { '@id': new URL(withBase('/#person'), Astro.site!).href }, areaServed: 'IL', inLanguage: 'he' }));
+  provider: { '@id': new URL(withBase('/#person'), siteOrigin(Astro)).href }, areaServed: 'IL', inLanguage: 'he' }));
 ---
 <Base title={p.seoTitle ?? p.title} description={p.seoDescription} jsonld={ld}>
   <PageHero kicker={p.kicker} title={p.title} intro={p.intro} art="/media/art/lectern.png">

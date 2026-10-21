@@ -1,0 +1,20 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import spec from '../../admin/formspec.json';
+import { withBase } from '../../lib/data';
+import { SINGLETON_PATH } from '../../lib/publicUrl';
+const S = spec.singletons as Record<string, { label: string; description?: string }>;
+const ids = spec.groups.flatMap((g) => g.items);
+---
+<Admin title="עמודי האתר" screen="pages" active="pages">
+  <h1>עמודי האתר</h1>
+  <p class="lead">כל הטקסטים של כל עמוד, לפי הסדר שבו הם מופיעים בעמוד.</p>
+  <ul class="rows">
+    {ids.map((id) => (
+      <li class="row">
+        <a class="row-main" href={withBase(`/admin/edit/${id}/`)}><strong>{S[id].label}</strong>{S[id].description && <span class="muted">{S[id].description}</span>}</a>
+        <a class="btn btn-small btn-ghost" href={withBase(SINGLETON_PATH[id] ?? '/')} target="_blank" rel="noopener">באתר ↗</a>
+      </li>
+    ))}
+  </ul>
+</Admin>

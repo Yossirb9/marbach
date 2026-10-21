@@ -2,14 +2,16 @@
 import '../styles/global.css';
 import '../styles/pages.css';
 import Icon from '../components/Icon.astro';
-import { settings, layout, CONTACT, MENU, img, withBase } from '../lib/data';
+import { useData, withBase, jsonForScript, siteOrigin } from '../lib/data';
 // preload the subsets the first screen uses, so the late font swap does not shift the hero (CLS)
 import frankHe from '@fontsource-variable/frank-ruhl-libre/files/frank-ruhl-libre-hebrew-wght-normal.woff2?url';
 import assistantHe from '@fontsource-variable/assistant/files/assistant-hebrew-wght-normal.woff2?url';
 
 interface Props { title: string; description?: string; image?: string; jsonld?: object[]; bodyClass?: string }
-const { title, description = '', image = '/media/art/og-plate.jpg', jsonld = [], bodyClass } = Astro.props;
-const site = Astro.site!;
+const { title, description: rawDescription = '', image = '/media/art/og-plate.jpg', jsonld = [], bodyClass } = Astro.props;
+const { settings, layout, CONTACT, MENU, img, fill } = useData(Astro.locals);
+const description = fill(rawDescription);
+const site = siteOrigin(Astro);
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL(img(image).at(1200), site).href;
 const path = Astro.url.pathname;
@@ -48,7 +50,7 @@ const ld = [person, ...jsonld];
   <meta property="og:url" content={canonical} />
   <meta property="og:image" content={ogImage} />
   <meta name="twitter:card" content="summary_large_image" />
-  {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+  {ld.map((o) => <script type="application/ld+json" set:html={jsonForScript(o)} />)}
   <!-- before first paint: scenes and reveals start in their "before" state (CSS under html.js), never flashing the final one -->
   <script is:inline>document.documentElement.classList.add('js')</script>
 </head>

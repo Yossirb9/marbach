@@ -127,9 +127,11 @@ $$<HTMLFormElement>('form[data-contact]').forEach((form) => {
 });
 
 // ---------- "כתבו המלצה": the recommendation goes to Ofer on WhatsApp (or in an email), already written ----------
-// No backend and no form service: nothing is stored. Ofer publishes it himself in the CMS (המלצות).
+// It is also stored on the site as "waiting for approval" (src/pages/api/recommend.ts); Ofer approves it in the admin.
 $$<HTMLFormElement>('form[data-recommend]').forEach((form) => {
   const err = $('[data-form-error]', form);
+  const shown = Date.now();
+  let stored = '';
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const via = ((e as SubmitEvent).submitter as HTMLElement | null)?.dataset.send === 'mail' ? 'mail' : 'wa';
@@ -147,6 +149,12 @@ $$<HTMLFormElement>('form[data-recommend]').forEach((form) => {
     if (val('role')) lines.push(`${label('role')}: ${val('role')}`);
     lines.push(`${label('consent')}: ${consent ? 'כן' : 'לא'}`);
     const text = lines.join('\n').replace(/^\n+/, '');
+    // the copy for the admin's inbox (once per text; keepalive: it survives leaving the page for WhatsApp/mail)
+    const body = JSON.stringify({ name: val('name'), role: val('role'), text: val('text'), consent: !!consent, website: val('website'), t: Date.now() - shown });
+    if (form.dataset.api && body.replace(/"t":\d+/, '') !== stored) {
+      stored = body.replace(/"t":\d+/, '');
+      fetch(form.dataset.api, { method: 'POST', headers: { 'content-type': 'application/json' }, body, keepalive: true, credentials: 'same-origin' }).catch(() => {});
+    }
     const url = via === 'wa'
       ? `${form.dataset.wa}?text=${encodeURIComponent(text)}`
       : `mailto:${form.dataset.email}?subject=${encodeURIComponent(form.dataset.subject || 'המלצה')}&body=${encodeURIComponent(text)}`;
