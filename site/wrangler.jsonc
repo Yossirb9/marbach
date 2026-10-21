@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "marbach",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "471704b8-320b-4a48-98c3-873c0f28d500",
       "migrations_dir": "migrations"
     }
   ],
@@ -22,7 +22,7 @@
     // the public address of the site (canonical links, sharing previews). Empty = the address the page was requested on.
     "SITE_URL": "",
     // PBKDF2 iterations for new passwords (Workers allows at most 100000; each hash keeps its own count)
-    "PBKDF2_ITERATIONS": "100000"
+    "PBKDF2_ITERATIONS": "50000"
   },
   "observability": { "enabled": true }
 }
