@@ -198,3 +198,13 @@
 .field-check input { width: 22px; height: 22px; min-height: 0; margin: 0.15rem 0 0; flex: none; accent-color: var(--brass); }
 .contact-recommend { margin-top: 2rem; padding-top: 1.4rem; border-top: 1px solid var(--line); }
 .contact-recommend a { font-weight: 700; color: var(--brass-text); }
+
+/* card illustrations sit beside the heading (left in RTL), not above it (Yossi 22.10: "takes real estate") */
+.track-top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.track-top h3 { margin: 0; }
+.track-top .track-art { flex: none; width: 76px; height: 76px; margin: 0; }
+@media (max-width: 760px) {
+  .talk { position: relative; }
+  .talk .talk-art { position: absolute; top: 0; left: 0; order: 0; width: 76px; height: 76px; max-height: 76px; object-fit: contain; justify-self: auto; }
+  .talk h3 { padding-inline-end: 88px; min-height: 76px; display: flex; align-items: center; }
+}

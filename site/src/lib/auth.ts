@@ -47,7 +47,7 @@ export function generatePassword() {
 }
 
 export const passwordProblem = (p: string) =>
-  p.length < 10 ? 'סיסמה של 10 תווים לפחות' : p.length > 200 ? 'סיסמה ארוכה מדי' : null;
+  p.length < 6 ? 'סיסמה של 6 תווים לפחות' : p.length > 200 ? 'סיסמה ארוכה מדי' : null;
 
 export interface SessionUser { id: number; username: string; display_name: string; role: 'admin' | 'editor'; csrf: string; sid: string }
 

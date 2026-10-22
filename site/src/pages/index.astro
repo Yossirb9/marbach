@@ -101,8 +101,10 @@ const ld = [{ '@context': 'https://schema.org', '@type': 'WebSite', name: 'ד״�
           const list = talks.filter((x) => x.audience === t.audience || (x.audience === 'all' && t.audience !== 'principals'));
           return (
             <a class="card card-link track" href={withBase(`/lectures/#${t.audience}`)} data-reveal style={`--d:${i * 0.08}s`}>
-              <span class="track-art" aria-hidden="true"><img src={a.at(360)} alt="" loading="lazy" decoding="async" /></span>
-              <h3>{t.title}</h3>
+              <div class="track-top">
+                <h3>{t.title}</h3>
+                <span class="track-art" aria-hidden="true"><img src={a.at(360)} alt="" loading="lazy" decoding="async" /></span>
+              </div>
               {t.text && <p>{t.text}</p>}
               <ul class="track-list">{list.slice(0, 4).map((x) => <li>{x.title}</li>)}</ul>
               <span class="link-arrow">{tracks.link}<Icon name="arrow" /></span>

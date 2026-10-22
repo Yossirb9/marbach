@@ -8,8 +8,8 @@ const me = Astro.locals.user!;
   <form id="pw" class="card narrow-form">
     <h2 class="h3">החלפת סיסמה</h2>
     <label class="field"><span class="label">הסיסמה הנוכחית</span><input class="input" type="password" name="current" autocomplete="current-password" dir="ltr" required /></label>
-    <label class="field"><span class="label">סיסמה חדשה (10 תווים לפחות)</span><input class="input" type="password" name="next" autocomplete="new-password" dir="ltr" minlength="10" required /></label>
-    <label class="field"><span class="label">שוב את הסיסמה החדשה</span><input class="input" type="password" name="again" autocomplete="new-password" dir="ltr" minlength="10" required /></label>
+    <label class="field"><span class="label">סיסמה חדשה (6 תווים לפחות)</span><input class="input" type="password" name="next" autocomplete="new-password" dir="ltr" minlength="6" required /></label>
+    <label class="field"><span class="label">שוב את הסיסמה החדשה</span><input class="input" type="password" name="again" autocomplete="new-password" dir="ltr" minlength="6" required /></label>
     <button class="btn btn-primary" type="submit">החלפת סיסמה</button>
     <p class="help">אחרי ההחלפה, כל מכשיר אחר שמחובר בחשבון הזה מתנתק.</p>
   </form>
